@@ -31,10 +31,16 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private final Key SECRET_KEY;
 
     private static final List<String> EXCLUDED_PATHS = Arrays.asList(
+            // Login/logout endpoints (with or without context path)
             "/api/mileage/auth/login$",
+            "/milestone25/api/mileage/auth/login$",
+            "/milestone25_1/api/mileage/auth/login$",
             "/mileage/api/mileage/auth/login$",
             "/api/mileage/auth/logout$",
+            "/milestone25/api/mileage/auth/logout$",
+            "/milestone25_1/api/mileage/auth/logout$",
             "/mileage/api/mileage/auth/logout$",
+            // Swagger paths (with or without context path)
             "^/swagger-ui",
             "^/v3/api-docs",
             "^/swagger-resources",
@@ -84,25 +90,35 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             }
         }
 
-        // if (accessToken == null) {
-        // log.error("❌ JwtTokenFilter: accessToken 쿠키가 존재하지 않습니다. 로그인 필요.");
-        // throw new DoNotLoginException();
-        // }
+        // ✅ Check if both tokens are null before validation
+        if (accessToken == null && refreshToken == null) {
+            log.error("❌ JwtTokenFilter: accessToken과 refreshToken이 모두 존재하지 않습니다. 로그인 필요.");
+            log.error("   Request URI: {}", requestURI);
+            throw new DoNotLoginException();
+        }
 
-        try {
-            String userId = JwtUtil.getUserId(accessToken, SECRET_KEY);
-            Users loginUser = authService.getLoginUser(userId);
+        // ✅ Try accessToken first (if available)
+        if (accessToken != null) {
+            try {
+                String userId = JwtUtil.getUserId(accessToken, SECRET_KEY);
+                Users loginUser = authService.getLoginUser(userId);
 
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    loginUser.getUniqueId(), null, null);
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        } catch (WrongTokenException e) {
-            log.info("❗ {}", e.getMessage());
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                        loginUser.getUniqueId(), null, null);
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                
+                // ✅ Success - continue filter chain
+                filterChain.doFilter(request, response);
+                return;
+            } catch (WrongTokenException e) {
+                log.info("❗ Access token validation failed: {}", e.getMessage());
+                // Fall through to try refreshToken
+            }
+        }
 
-            // accessToken이 만료된 경우, refreshToken으로 재발급 시도
-            // JwtTokenFilter.java에서 리프레시 토큰 처리 부분 수정:
-            if (refreshToken != null) {
+        // ✅ Access token failed or is null - try refreshToken
+        if (refreshToken != null) {
                 try {
                     String userId = JwtUtil.getUserId(refreshToken, SECRET_KEY);
                     Users loginUser = authService.getLoginUser(userId);
@@ -128,30 +144,50 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                             loginUser.getUniqueId(), null, null);
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    
+                    // ✅ Success - continue filter chain
+                    filterChain.doFilter(request, response);
+                    return;
                 } catch (Exception refreshEx) {
                     // 더 상세한 로깅을 포함한 개선된 예외 처리
                     log.error("❌ 토큰 리프레시 실패: {}", refreshEx.getMessage());
                     throw new DoNotLoginException();
                 }
-            } else {
-                log.error("❌ refreshToken이 존재하지 않습니다. 로그인이 필요합니다.");
-                throw new DoNotLoginException();
-            }
+        } else {
+            // ✅ Both tokens failed or are null
+            log.error("❌ refreshToken이 존재하지 않습니다. 로그인이 필요합니다.");
+            log.error("   Request URI: {}", requestURI);
+            throw new DoNotLoginException();
         }
-
-        filterChain.doFilter(request, response);
     }
 
     private boolean isExcludedPath(String requestURI) {
+        log.debug("🔍 Checking if path is excluded: {}", requestURI);
+        
         // Check regex patterns
-        if (EXCLUDED_PATHS.stream().anyMatch(requestURI::matches)) {
+        boolean matchesRegex = EXCLUDED_PATHS.stream().anyMatch(requestURI::matches);
+        if (matchesRegex) {
+            log.debug("✅ Path matches excluded regex pattern");
             return true;
         }
+        
         // Fallback: check if URI contains Swagger-related paths (case-insensitive)
         String lowerURI = requestURI.toLowerCase();
-        return lowerURI.contains("/swagger-ui") ||
+        boolean isSwaggerPath = lowerURI.contains("/swagger-ui") ||
                 lowerURI.contains("/v3/api-docs") ||
                 lowerURI.contains("/swagger-resources") ||
                 lowerURI.contains("/webjars");
+        
+        // Also check for login/logout endpoints (more flexible matching)
+        boolean isAuthEndpoint = lowerURI.contains("/api/mileage/auth/login") ||
+                lowerURI.contains("/api/mileage/auth/logout");
+        
+        if (isSwaggerPath || isAuthEndpoint) {
+            log.debug("✅ Path matches excluded path (fallback check)");
+            return true;
+        }
+        
+        log.debug("❌ Path is NOT excluded - authentication required");
+        return false;
     }
 }
