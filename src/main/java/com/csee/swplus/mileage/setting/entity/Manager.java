@@ -24,4 +24,7 @@ public class Manager {
 
     @Column(name = "reg_end")
     private String regEnd;
+
+    @Column(name = "contact_info", length = 200)
+    private String contactInfo;
 }

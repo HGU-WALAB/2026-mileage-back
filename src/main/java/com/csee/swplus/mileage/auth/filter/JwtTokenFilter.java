@@ -34,8 +34,19 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             "/api/mileage/auth/login$",
             "/mileage/api/mileage/auth/login$",
             "/api/mileage/auth/logout$",
-            "/mileage/api/mileage/auth/logout$"
-    );
+            "/mileage/api/mileage/auth/logout$",
+            "^/swagger-ui",
+            "^/v3/api-docs",
+            "^/swagger-resources",
+            "^/webjars",
+            "^/milestone25/swagger-ui",
+            "^/milestone25/v3/api-docs",
+            "^/milestone25/swagger-resources",
+            "^/milestone25/webjars",
+            "^/milestone25_1/swagger-ui",
+            "^/milestone25_1/v3/api-docs",
+            "^/milestone25_1/swagger-resources",
+            "^/milestone25_1/webjars");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -49,32 +60,41 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             return;
         }
 
-        Cookie[] cookies = request.getCookies();
+        // Get token from Authorization header (for Swagger/Bearer token) or from
+        // cookies
+        String authHeader = request.getHeader("Authorization");
         String accessToken = null;
         String refreshToken = null;
 
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("accessToken".equals(cookie.getName())) {
-                    accessToken = cookie.getValue();
-                }
-                if ("refreshToken".equals(cookie.getName())) {
-                    refreshToken = cookie.getValue();
+        // Check Authorization header for Bearer token (used by Swagger)
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            accessToken = authHeader.substring(7); // Remove "Bearer " prefix
+        } else {
+            // Fall back to cookies
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if ("accessToken".equals(cookie.getName())) {
+                        accessToken = cookie.getValue();
+                    }
+                    if ("refreshToken".equals(cookie.getName())) {
+                        refreshToken = cookie.getValue();
+                    }
                 }
             }
         }
 
-//        if (accessToken == null) {
-//            log.error("❌ JwtTokenFilter: accessToken 쿠키가 존재하지 않습니다. 로그인 필요.");
-//            throw new DoNotLoginException();
-//        }
+        // if (accessToken == null) {
+        // log.error("❌ JwtTokenFilter: accessToken 쿠키가 존재하지 않습니다. 로그인 필요.");
+        // throw new DoNotLoginException();
+        // }
 
         try {
             String userId = JwtUtil.getUserId(accessToken, SECRET_KEY);
             Users loginUser = authService.getLoginUser(userId);
 
-            UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(loginUser.getUniqueId(), null, null);
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                    loginUser.getUniqueId(), null, null);
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         } catch (WrongTokenException e) {
@@ -91,8 +111,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                     String newAccessToken = authService.createAccessToken(
                             loginUser.getUniqueId(),
                             loginUser.getName(),
-                            loginUser.getEmail()
-                    );
+                            loginUser.getEmail());
 
                     // 새 액세스 토큰을 쿠키로 설정
                     Cookie newAccessTokenCookie = new Cookie("accessToken", newAccessToken);
@@ -105,8 +124,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                     log.info("🔄 사용자 {} 액세스 토큰 리프레시 성공", loginUser.getName());
 
                     // 인증 설정
-                    UsernamePasswordAuthenticationToken authenticationToken =
-                            new UsernamePasswordAuthenticationToken(loginUser.getUniqueId(), null, null);
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                            loginUser.getUniqueId(), null, null);
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 } catch (Exception refreshEx) {
@@ -124,6 +143,15 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     }
 
     private boolean isExcludedPath(String requestURI) {
-        return EXCLUDED_PATHS.stream().anyMatch(requestURI::matches);
+        // Check regex patterns
+        if (EXCLUDED_PATHS.stream().anyMatch(requestURI::matches)) {
+            return true;
+        }
+        // Fallback: check if URI contains Swagger-related paths (case-insensitive)
+        String lowerURI = requestURI.toLowerCase();
+        return lowerURI.contains("/swagger-ui") ||
+                lowerURI.contains("/v3/api-docs") ||
+                lowerURI.contains("/swagger-resources") ||
+                lowerURI.contains("/webjars");
     }
 }

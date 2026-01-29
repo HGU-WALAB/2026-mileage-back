@@ -1,10 +1,12 @@
 package com.csee.swplus.mileage.setting.controller;
 
+import com.csee.swplus.mileage.setting.dto.ContactResponse;
 import com.csee.swplus.mileage.setting.dto.ManagerResponse;
 import com.csee.swplus.mileage.setting.entity.Manager;
 import com.csee.swplus.mileage.setting.service.ManagerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,5 +26,18 @@ public class ManagerController {
         }
 
         return new ManagerResponse(manager.getRegStart(), manager.getRegEnd());
+    }
+
+    @GetMapping("/contact")
+    public ResponseEntity<ContactResponse> getContact() {
+        Manager manager = managerService.getRegisterDate();
+
+        if (manager == null) {
+            log.error("Manager 정보가 없습니다.");
+            return ResponseEntity.ok(new ContactResponse(""));
+        }
+
+        String contactInfo = manager.getContactInfo() != null ? manager.getContactInfo() : "";
+        return ResponseEntity.ok(new ContactResponse(contactInfo));
     }
 }

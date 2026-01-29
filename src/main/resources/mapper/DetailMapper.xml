@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csee.swplus.mileage.subitem.mapper.DetailMapper">
+    <select id="findAllDetailSubitems" resultType="com.csee.swplus.mileage.subitem.dto.DetailResponseDto">
+        SELECT
+            mS.id AS subitemId,
+            mS.subitem_name AS subitemName,
+            mM.id AS capabilityId,
+            mM.name AS capabilityName,
+            mS.semester AS semester,
+            mR.id AS recordId,
+            mR.description1 AS description1,
+            CASE
+                WHEN mR.id IS NOT NULL THEN TRUE
+                ELSE FALSE
+                END AS done
+        FROM _sw_mileage_subitem AS mS
+                 INNER JOIN _sw_mileage_category AS mC
+                            ON mS.category_id = mC.id
+                 LEFT JOIN _sw_category_milestone AS mCM
+                           ON mC.id = mCM.category_id
+                 LEFT JOIN _sw_milestone AS mM
+                           ON mCM.milestone_id = mM.id
+                 INNER JOIN _sw_mileage_record AS mR
+                            ON mR.subitem_id = mS.id
+        WHERE mR.snum = #{studentId} AND mR.semester = #{currentSemester}
+        ORDER BY mM.name, mS.regdate
+    </select>
+</mapper>
+

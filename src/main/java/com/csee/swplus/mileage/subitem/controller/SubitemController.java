@@ -1,7 +1,9 @@
 package com.csee.swplus.mileage.subitem.controller;
 
+import com.csee.swplus.mileage.subitem.dto.DetailResponseDto;
 import com.csee.swplus.mileage.subitem.dto.SubitemRequestDto;
 import com.csee.swplus.mileage.subitem.dto.SubitemResponseDto;
+import com.csee.swplus.mileage.subitem.service.DetailService;
 import com.csee.swplus.mileage.subitem.service.SubitemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SubitemController {
     private final SubitemService subitemService;
+    private final DetailService detailService;
 
     @GetMapping("/search")
     public List<SubitemResponseDto> getSubitems(
@@ -32,5 +35,12 @@ public class SubitemController {
         requestDto.setSemester(semester);
         requestDto.setDone(done);
         return subitemService.getSubitems(requestDto);
+    }
+
+    @GetMapping("/detail")
+    public List<DetailResponseDto> getAllDetailSubitems() {
+        String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+        log.info("Received detail request for all subitems");
+        return detailService.getAllDetailSubitems(currentUserId);
     }
 }

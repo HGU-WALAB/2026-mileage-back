@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.csee.swplus.mileage.archive.award.mapper.AwardMapper">
+
+    <select id="findAllAwards" resultType="com.csee.swplus.mileage.archive.award.dto.AwardResponseDto">
+        SELECT a.id AS awardId,
+               a.award_year AS awardYear,
+               NULLIF(NULLIF(a.award_date, ''), ' ') AS awardDate,
+               a.contest_name AS contestName,
+               a.award_name AS awardName,
+               a.award_type AS awardType,
+               a.organization,
+               a.regdate AS regDate,
+               a.moddate AS modDate
+        FROM _sw_mileage_award AS a
+        WHERE a.snum = #{studentId}
+        ORDER BY a.award_year, a.award_date DESC;
+    </select>
+
+</mapper>
+
