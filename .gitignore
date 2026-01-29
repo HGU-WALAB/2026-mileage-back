@@ -1,0 +1,89 @@
+HELP.md
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### Application Properties ###
+# Keep base application properties, ignore profile-specific ones
+*.properties
+*.yml
+
+### Test Data ###
+uploads/*
+project-thumbnail/*
+Users/*
+
+### SSL Certificates ###
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pem
+*.crt
+*.key
+
+### Configuration ###
+config/
+
+### Environment Variables ###
+.env
+.env.*
+
+### Logs ###
+*.log
+logs/
+
+### OS Files ###
+.DS_Store
+Thumbs.db
+
+### Temporary Files ###
+*.tmp
+*.temp
+*.swp
+*~
+
+### Database ###
+*.db
+*.sqlite
+data/
+
+
+src/main/java/com/csee/swplus/mileage/auth/controller/AuthController.java
+
+src/main/java/com/csee/swplus/mileage/auth/service/HisnetLoginService.java
+
+src/main/java/com/csee/swplus/mileage/scholarship/controller/ScholarshipController.java

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.csee.swplus.mileage.milestone.mapper.MilestoneMapper">
+
+    <select id="findAllMilestoneCapability" resultType="com.csee.swplus.mileage.milestone.dto.response.MilestoneResponseDto">
+        SELECT id AS capabilityId,
+               name AS capabilityName,
+               description AS description
+        FROM _sw_milestone;
+    </select>
+
+    <select id="findAllMilestonePoint" resultType="com.csee.swplus.mileage.milestone.dto.response.MilestonePointResponseDto">
+        SELECT
+            m.id AS capabilityId,
+            m.name AS capabilityName,
+            IFNULL(COUNT(DISTINCT CASE WHEN s.snum = #{studentId} THEN r.subitem_id END), 0) AS milestoneCount,
+            IFNULL(COUNT(DISTINCT si.id), 0) AS totalMilestoneCount
+        FROM _sw_milestone m
+                 LEFT JOIN _sw_category_milestone cm
+                           ON m.id = cm.milestone_id
+                 LEFT JOIN _sw_mileage_category c
+                           ON cm.category_id = c.id
+                 LEFT JOIN _sw_mileage_subitem si
+                           ON c.id = si.category_id
+                 LEFT JOIN _sw_mileage_record r
+                           ON si.id = r.subitem_id
+                 LEFT JOIN _sw_student s ON r.snum = s.snum
+        GROUP BY
+            m.id,
+            m.name
+        ORDER BY
+            m.id;
+    </select>
+
+<!-- [피드백 수용 전 코드] 마일스톤 역량 포인트를 마일리지 포인트로 계산함: 관리자 서비스 측 max_point 설정으로 인해 로직 상 문제 발생 -->
+<!--    <resultMap id="SemesterResultMap" type="com.csee.swplus.mileage.milestone.dto.response.MilestoneSemesterResponseDto">-->
+<!--        <id property="semester" column="semester"/>-->
+<!--        <collection property="milestone" ofType="com.csee.swplus.mileage.milestone.dto.response.MilestonePointResponseDto">-->
+<!--            <result property="capabilityId" column="capabilityId"/>-->
+<!--            <result property="capabilityName" column="capabilityName"/>-->
+<!--            <result property="capabilityPoint" column="capabilityPoint"/>-->
+<!--        </collection>-->
+<!--    </resultMap>-->
+
+<!--    <select id="findEachMilestoneBySemester" resultMap="SemesterResultMap">-->
+<!--        SELECT-->
+<!--            r.semester,-->
+<!--            m.id AS capabilityId,-->
+<!--            m.name AS capabilityName,-->
+<!--            IFNULL(SUM(r.m_point), 0) AS capabilityPoint-->
+<!--        FROM _sw_milestone m-->
+<!--                 LEFT JOIN category_milestone cm-->
+<!--                           ON m.id = cm.milestone_id-->
+<!--                 LEFT JOIN _sw_mileage_category c-->
+<!--                           ON cm.category_id = c.id-->
+<!--                 LEFT JOIN _sw_mileage_subitem si-->
+<!--                           ON c.id = si.category_id-->
+<!--                 LEFT JOIN _sw_mileage_record r-->
+<!--                           ON si.id = r.subitem_id-->
+<!--                 LEFT JOIN _sw_student s ON r.snum = s.snum-->
+<!--        WHERE s.id = #{studentId}-->
+<!--        GROUP BY-->
+<!--            r.semester,-->
+<!--            m.id,-->
+<!--            m.name-->
+<!--        ORDER BY-->
+<!--            r.semester,-->
+<!--            m.id;-->
+<!--    </select>-->
+
+    <select id="findAllMilestoneBySemester" resultType="com.csee.swplus.mileage.milestone.dto.response.MilestoneSemesterTotalPointResponseDto">
+        SELECT
+            r.semester,
+            IFNULL(COUNT(DISTINCT r.subitem_id), 0) AS userMilestoneCount,
+            IFNULL((
+                       SELECT COUNT(DISTINCT si.id)
+                       FROM _sw_mileage_subitem si
+                       WHERE si.semester = r.semester
+                   ), 0) AS totalMilestoneCount
+        FROM _sw_mileage_record r
+                 LEFT JOIN _sw_student s ON r.snum = s.snum
+        WHERE s.snum = #{studentId}
+        GROUP BY
+            r.semester
+        ORDER BY
+            r.semester;
+    </select>
+
+</mapper>

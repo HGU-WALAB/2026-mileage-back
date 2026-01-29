@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.csee.swplus.mileage.scholarship.mapper.ScholarshipMapper">
+
+    <update id="updateStudentApplicationStatus" parameterType="map">
+        UPDATE _sw_student
+        SET is_apply = 1,
+            apply_date = #{applyDate},
+            isChecked = #{isChecked}
+        WHERE snum = #{studentId};
+    </update>
+
+    <insert id="createApplication" parameterType="map">
+        INSERT INTO _sw_mileage_scholarship (snum, is_apply, semester, apply_date)
+        SELECT
+            snum,
+            #{isChecked},
+            #{semester},
+            NOW()
+        FROM _sw_student
+        WHERE snum = #{studentId}
+          AND NOT EXISTS (
+            SELECT 1
+            FROM _sw_mileage_scholarship
+            WHERE snum = #{studentId}
+              AND semester = #{semester}
+        );
+    </insert>
+
+</mapper>
