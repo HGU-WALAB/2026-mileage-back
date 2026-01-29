@@ -23,6 +23,10 @@ repositories {
 	mavenCentral()
 }
 
+war {
+	archiveFileName = 'milestone25_1.war'
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -41,4 +45,7 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	// Skip tests if the build is for deployment
+	// To skip tests, run: ./gradlew clean build -x test
+	// Or set: test.enabled = false
 }

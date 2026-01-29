@@ -1,17 +1,12 @@
 package com.csee.swplus.mileage.milestone.controller;
 
-import com.csee.swplus.mileage.milestone.dto.response.MilestonePointResponseDto;
-import com.csee.swplus.mileage.milestone.dto.response.MilestoneResponseDto;
-import com.csee.swplus.mileage.milestone.dto.response.MilestoneSemesterTotalPointResponseDto;
+import com.csee.swplus.mileage.milestone.dto.response.*;
 import com.csee.swplus.mileage.milestone.service.MilestoneService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -45,6 +40,24 @@ public class MilestoneController {
         return ResponseEntity.ok(
                 milestoneService.getTotalMilestoneSemester(studentId)
         );
+    }
+
+    @GetMapping("/milestone/compare")
+    public ResponseEntity<List<MPResponseDto>> getAverageMilestonePoint(
+            @RequestParam(required = false) String term,
+            @RequestParam(required = false) String entryYear,
+            @RequestParam(required = false) String major
+    ) {
+        List<MPResponseDto> result = milestoneService.getFilteredAverageMilestonePoint(term, entryYear, major);
+        log.info("term={}, entryYear={}, major={}", term, entryYear, major);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/suggest")
+    public ResponseEntity<SuggestItemResponseDto> getSuggestItem() {
+        String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+        SuggestItemResponseDto result = milestoneService.getSuggestionsForStudent(currentUserId);
+        return ResponseEntity.ok(result);
     }
 
 //    @GetMapping("/milestone/{studentId}")

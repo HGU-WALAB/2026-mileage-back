@@ -88,4 +88,104 @@
             r.semester;
     </select>
 
+    <select id="findFilteredAverageMilestonePoint" resultType="com.csee.swplus.mileage.milestone.dto.response.MPResponseDto">
+        SELECT m.id AS capabilityId,
+               m.name AS capabilityName,
+               COALESCE(
+                    SUM(
+                        CASE WHEN milestone_records.milestone_id IS NOT NULL
+                            THEN milestone_records.record_count
+                            ELSE 0 END
+                    ), 0) AS totalMilestoneCount,
+                (
+                    SELECT COUNT(DISTINCT s.snum)
+                    FROM _sw_student s
+                    WHERE 1=1
+                        <if test="major != null">
+                            AND s.major_1 = #{major}
+                        </if>
+                        <if test="term != null">
+                            AND s.semester_count = #{term}
+                        </if>
+                        <if test="entryYear != null">
+                            AND SUBSTRING(s.snum, 2, 2) = #{entryYear}
+                        </if>
+                ) AS groupSize
+        FROM _sw_milestone m
+        LEFT JOIN (
+            SELECT m.id AS milestone_id,
+                COUNT(DISTINCT CONCAT(r.snum, r.id)) AS record_count
+            FROM _sw_milestone m
+            JOIN _sw_category_milestone cm ON m.id = cm.milestone_id
+            JOIN _sw_mileage_category c ON cm.category_id = c.id
+            JOIN _sw_mileage_subitem si ON c.id = si.category_id
+            JOIN _sw_mileage_record r ON si.id = r.subitem_id
+            LEFT JOIN _sw_student s ON r.snum = s.snum
+            WHERE si.semester = #{currentSemester}
+                <if test="major != null">
+                    AND s.major_1 = #{major}
+                </if>
+                <if test="term != null">
+                    AND s.semester_count = #{term}
+                </if>
+                <if test="entryYear != null">
+                    AND SUBSTRING(s.snum, 2, 2) = #{entryYear}
+                </if>
+            GROUP BY m.id
+        ) milestone_records ON m.id = milestone_records.milestone_id
+        GROUP BY m.id, m.name
+        ORDER BY m.id;
+    </select>
+
+    <select id="findSuggestItemByUserId" resultType="java.util.Map">
+        <!-- 1단계: 학생의 가장 낮은 역량 찾기 -->
+        SELECT
+            lc.capabilityName,
+            si.subitem_name AS subitemName,
+            COUNT(DISTINCT r_pop.snum) AS participantCount
+        FROM (
+        SELECT
+            m.id AS capabilityId,
+            m.name AS capabilityName,
+            IFNULL(COUNT(DISTINCT CASE WHEN s.snum = #{studentId} THEN r.subitem_id END), 0) AS milestoneCount,
+            IFNULL(COUNT(DISTINCT si.id), 0) AS totalMilestoneCount,
+                CASE
+                WHEN IFNULL(COUNT(DISTINCT si.id), 0) = 0 THEN 0
+                ELSE IFNULL(COUNT(DISTINCT CASE WHEN s.snum = #{studentId} THEN r.subitem_id END), 0) /
+            IFNULL(COUNT(DISTINCT si.id), 0)
+                END AS achievementRate
+        FROM _sw_milestone m
+        LEFT JOIN _sw_category_milestone cm ON m.id = cm.milestone_id
+        LEFT JOIN _sw_mileage_category c ON cm.category_id = c.id
+        LEFT JOIN _sw_mileage_subitem si ON c.id = si.category_id
+        LEFT JOIN _sw_mileage_record r ON si.id = r.subitem_id
+        LEFT JOIN _sw_student s ON r.snum = s.snum
+        WHERE EXISTS (
+            SELECT 1 FROM _sw_student WHERE snum = #{studentId}
+        )
+        GROUP BY m.id, m.name
+        HAVING totalMilestoneCount > 0
+        ORDER BY achievementRate ASC, milestoneCount ASC
+            LIMIT 1
+        ) AS lc
+
+        /* 2단계: 가장 낮은 역량에 해당하는 활동 중 학생이 참여하지 않은 인기 활동 찾기 */
+        JOIN _sw_category_milestone cm ON lc.capabilityId = cm.milestone_id
+        JOIN _sw_mileage_category c ON cm.category_id = c.id
+        JOIN _sw_mileage_subitem si ON c.id = si.category_id
+        LEFT JOIN _sw_mileage_record r_pop ON si.id = r_pop.subitem_id
+
+        /* 학생이 참여하지 않은 활동만 포함 */
+        WHERE si.id NOT IN (
+            SELECT subitem_id
+            FROM _sw_mileage_record
+            WHERE snum = #{studentId}
+        )
+        AND si.id IS NOT NULL
+
+        GROUP BY lc.capabilityName, si.subitem_name
+        ORDER BY participantCount DESC
+        LIMIT 3;
+    </select>
+
 </mapper>
