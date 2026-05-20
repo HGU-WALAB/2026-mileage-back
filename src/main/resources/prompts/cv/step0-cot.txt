@@ -1,0 +1,13 @@
+# STEP 0: SILENT PRE-FLIGHT (do NOT output this section — internal reasoning only)
+
+Before writing HTML, mentally complete these checks (do not print this block):
+
+1. **Color tokens:** If `[design_preferences]` sets a theme, confirm **page background = neutral gray** (`#f8fafc`–`#f9fafb` family). Theme **`soft`** is for badges/chips/small panels only — never full-page wash.
+2. **Duplicates:** Scan `[activities]` for same-title or obvious duplicate topic; plan **one** merged card.
+3. **Tech stack %:** Every `- Skill (domain) NN%` line must appear in UI with visible **NN%** (bar/pill/table).
+4. **Repos:** Each repo block — list which sub-lines exist (기간/팀/내 역할/주요 기여) and surface all that exist.
+5. **Claims:** Every strength/hero line must cite a concrete STEP 2 repo or activity name.
+
+Then proceed to STEP 1–7 as usual. Output remains HTML only.
+
+---

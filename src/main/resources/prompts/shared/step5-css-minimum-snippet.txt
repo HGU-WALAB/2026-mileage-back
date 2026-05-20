@@ -1,0 +1,76 @@
+<!--
+  Reference baseline for custom-design HTML (STEP 5-B). Adapt colors to STEP 4 tokens.
+  Include @import FIRST inside <style>; pair with Google Fonts <link> in <head>.
+-->
+<style>
+/* --- snippet start (merge into your stylesheet) --- */
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap");
+
+:root {
+  --page-bg: #f8fafc;
+  --card-bg: #ffffff;
+  --text: #111827;
+  --muted: #64748b;
+  --primary: #2563eb;
+  --primary-soft: #e5edff;
+  --border: rgba(148, 163, 184, 0.35);
+  --radius: 14px;
+}
+
+html, body {
+  margin: 0;
+  font-family: "Noto Sans KR", system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.55;
+  background: var(--page-bg);
+  color: var(--text);
+}
+
+h1 { font-size: 1.75rem; font-weight: 700; line-height: 1.2; margin: 0 0 0.35em; }
+h2 { font-size: 1.28rem; font-weight: 700; line-height: 1.22; margin: 0 0 0.35em; }
+h3 { font-size: 1.08rem; font-weight: 600; line-height: 1.28; margin: 0 0 0.3em; }
+p  { margin: 0 0 0.65em; }
+
+.section-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+/* Tech stack % — horizontal bar pattern */
+.skill-row { margin-bottom: 0.55rem; }
+.skill-meta {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 0.88rem; margin-bottom: 0.2rem;
+}
+.skill-track {
+  height: 8px; border-radius: 999px;
+  background: #e2e8f0; overflow: hidden;
+}
+.skill-fill {
+  height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, var(--primary), #6366f1);
+}
+
+@media print {
+  body { font-size: 11pt; line-height: 1.45; background: #fff !important; color: #000 !important; }
+  .section-card { box-shadow: none !important; break-inside: avoid; page-break-inside: avoid; }
+  a { color: #000 !important; text-decoration: underline; }
+}
+/* --- snippet end --- */
+</style>
+
+<!--
+HTML usage example (inside body):
+<div class="section-card">
+  <h2>Core Tech Stack</h2>
+  <div class="skill-row">
+    <div class="skill-meta"><span>Java</span><span>70%</span></div>
+    <div class="skill-track"><div class="skill-fill" style="width:70%"></div></div>
+  </div>
+</div>
+-->

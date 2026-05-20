@@ -1,0 +1,19 @@
+```
+
+---
+
+# OUTPUT FORMAT
+Return **only** JSON. You may wrap the JSON in a single ```json fenced block **or** emit raw `{ ... }`.
+
+Required top-level keys (use empty arrays/objects when unused):
+
+- **layout_summary** (string, Korean): planned layout vs STEP 4 preference.
+- **color_tokens** (object): include **page_background** (neutral hex), **primary_usage**, **soft_usage** (must say badges/tints only).
+- **duplicate_activity_clusters** (array of objects): each has **titles_involved** (strings from STEP 2) and **merge_into_single_card** (boolean).
+- **tech_stack_visualization** (array): each item has **skill_line_from_step2** (verbatim line including NN%) and **ui_pattern** (`horizontal_progress_bar` | `pill_with_percent` | `table_column`).
+- **repo_rendering_notes** (array): each item has **repo_title** (verbatim) and **surface_fields** (array listing which sub-lines exist in STEP 2 to show—기간/팀/역할/기여).
+- **strength_claims_with_evidence** (array): each item has **claim_ko** and **must_cite** (array of `"repo: …"` / `"activity: …"` references that exist in STEP 2).
+- **sections** (array): objects with **id**, **title_ko**, **evidence_refs**, **omit_if_empty**.
+- **fabrication_risks** (array of strings): where inference must be avoided.
+
+No prose outside JSON (except optional single ```json fence pair).

@@ -1,0 +1,13 @@
+# STEP 0: SILENT PRE-FLIGHT (do NOT output this section — internal reasoning only)
+
+Before writing HTML, mentally complete:
+
+1. **Color tokens:** Page background neutral; **`soft`** never full-page.
+2. **Duplicates:** Merge duplicate `[activities]` topics into one narrative card.
+3. **Tech stack %:** Preserve every NN% from STEP 2 with visible visualization.
+4. **Repos:** Surface 기간·팀·역할·주요 기여 lines when present in STEP 2.
+5. **Strengths:** Each bullet cites ≥1 `[activities]` or `[github_repos]` line by name.
+
+Then continue with STEP 1–7. Output remains HTML only.
+
+---
