@@ -13,6 +13,8 @@ The design direction, color palette, typography, and layout are NOT predetermine
 # STEP 1: ONE-SHOT (Archive mode)
 Do **not** ask clarifying questions. Do **not** wait for confirmation. Do **not** simulate a chat. Read STEP 2 and output the HTML in this single response.
 
+When `# PORTFOLIO_PLAN_JSON` appears after STEP 2, follow its merge/%/evidence cues — facts still limited strictly to STEP 2.
+
 ---
 
 # STEP 2: INPUT DATA

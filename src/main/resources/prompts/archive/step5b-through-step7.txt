@@ -27,7 +27,7 @@ Recommended reflective sections (omit empty sections automatically):
 ---
 
 # STEP 7: QUALITY CHECKLIST (silent, before output)
-- [ ] One-shot: no questions to the user
+- [ ] When `# PORTFOLIO_PLAN_JSON` is present, outline / merges / `%` visualization follow it — facts still bound to STEP 2 only
 - [ ] Tone is reflective, not resume hype
 - [ ] Strengths: every bullet cites at least one STEP 2 activity or repo by name
 - [ ] Gaps/growth: no generic-only tips; each tied to STEP 2 contrast (tech_stack vs repos/activities)

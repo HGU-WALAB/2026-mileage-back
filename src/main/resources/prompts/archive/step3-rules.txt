@@ -22,11 +22,23 @@
 - Never invent metrics, employers, awards, or repos not in STEP 2.
 - If a section has no lines, omit it or note clearly that nothing was selected.
 
+## RULE 5–8 테마 (Portfolio HTML 무결성 — 아래 번호 규칙과 함께)
+1. **Tech stack 시각화:** RULE 6 — 모든 NN% 유지·가시화.
+2. **중복 활동 병합:** RULE 5 — 유사 활동 단일 카드.
+3. **Repo 해석 깊이:** RULE 7 — 기간·팀·역할·기여 라인 전부 노출(존재 시).
+4. **강점 근거:** RULE 2·8 — 강점마다 활동/레포 제목 인용.
+
 ## RULE 5: Duplicate activities (`[activities]`)
 - If two or more entries are clearly the **same project/topic** (same title after trimming case-insensitive, or overlapping distinctive keywords + same role), **merge** into one narrative card/timeline row: combine periods or show both ranges once — **do not** show two identical cards side-by-side.
 - When unsure, prefer **one** consolidated entry over duplication.
 
 ## RULE 6: Tech stack percentages (`[tech_stack]`)
 - Lines often look like `- Skill (domain) NN%`. Preserve **every NN%** present in STEP 2 in the rendered HTML (sidebar pills, Tech Evidence table, progress bars, or explicit text like `Java 70%`). **Do not drop** numeric levels.
+
+## RULE 7: GitHub repos depth (`[github_repos]` detail lines)
+- Mirror CV/recruiter RULE 7: when STEP 2 lists **기간**, **팀 구성**, **내 역할**, **주요 기여** under a repo, those lines **must** appear in HTML as bullets or sub-blocks; skip lines that do not exist (no placeholders).
+
+## RULE 8: Strength citations (explicit)
+- Restates RULE 2: each reflective strength bullet cites ≥1 concrete STEP 2 title from `[activities]` or `[github_repos]` by name in the same bullet or sentence.
 
 ---
