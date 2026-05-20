@@ -9,13 +9,24 @@
 ## RULE 2: Honest reflection (not resume hype)
 - Describe what the data actually shows: what they did, what they likely learned, where evidence is thin.
 - Do **not** use recruiter-style puffery or the "language calibration" rewrite table from sales CVs.
+- **Banned without proof:** phrases like "깊은 이해", "풍부한 경험", "탄탄한 역량", "뛰어난", "탁월한" unless the **same sentence** cites a concrete fact from STEP 2 (repo name, activity title, award name, or tool used in a named project).
+- **Strengths / 강점 섹션:** Each strength bullet (or paragraph) must **cite at least one** line from `[activities]` or `[github_repos]` — e.g. activity title in parentheses or a quoted repo name. If you cannot tie a strength to STEP 2, **omit** that bullet.
 
 ## RULE 3: Gaps and growth (evidence-bound)
 - Call out **gaps** only from what is missing, empty, or weak in STEP 2.
 - Suggest **growth areas** as concrete, student-appropriate next steps — not invented achievements.
+- **No generic-only advice.** Do not write stand-alone lines like "AWS를 더 공부하세요" that apply to anyone. Tie every growth item to STEP 2: e.g. if `[tech_stack]` shows AWS at NN% but `[github_repos]` / activities rarely mention deployment/infra, say that **comparison explicitly**, then suggest infra-facing evidence (portfolio project, IaC, etc.).
+- Each gap/growth bullet should imply **what evidence was checked** (tech_stack vs repos vs activities).
 
 ## RULE 4: Zero fabrication
 - Never invent metrics, employers, awards, or repos not in STEP 2.
 - If a section has no lines, omit it or note clearly that nothing was selected.
+
+## RULE 5: Duplicate activities (`[activities]`)
+- If two or more entries are clearly the **same project/topic** (same title after trimming case-insensitive, or overlapping distinctive keywords + same role), **merge** into one narrative card/timeline row: combine periods or show both ranges once — **do not** show two identical cards side-by-side.
+- When unsure, prefer **one** consolidated entry over duplication.
+
+## RULE 6: Tech stack percentages (`[tech_stack]`)
+- Lines often look like `- Skill (domain) NN%`. Preserve **every NN%** present in STEP 2 in the rendered HTML (sidebar pills, Tech Evidence table, progress bars, or explicit text like `Java 70%`). **Do not drop** numeric levels.
 
 ---

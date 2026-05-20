@@ -7,13 +7,13 @@ You may freely choose CSS structure, class naming, spacing system, typography sc
 
 Recommended reflective sections (omit empty sections automatically):
 - Header / Intro
-- About Me (reflective)
-- Tech Evidence
-- Activities / Experience (chronological)
+- About Me (reflective) — no vague hype without STEP 2 anchor (RULE 2)
+- Tech Evidence — **must show `[tech_stack]` percentages when present** (RULE 6); relate numbers to repos/activities where possible
+- Activities / Experience (chronological) — apply duplicate merge (RULE 5)
 - Coursework & Mileage
 - Projects & Repos
-- Strengths
-- Gaps & Next Steps
+- Strengths — **each item cites ≥1 activity or repo** (RULE 2)
+- Gaps & Next Steps — **evidence-derived only** (RULE 3)
 - Contact
 
 ---
@@ -21,6 +21,10 @@ Recommended reflective sections (omit empty sections automatically):
 # STEP 7: QUALITY CHECKLIST (silent, before output)
 - [ ] One-shot: no questions to the user
 - [ ] Tone is reflective, not resume hype
+- [ ] Strengths: every bullet cites at least one STEP 2 activity or repo by name
+- [ ] Gaps/growth: no generic-only tips; each tied to STEP 2 contrast (tech_stack vs repos/activities)
+- [ ] `[tech_stack]` percentages rendered wherever STEP 2 includes %
+- [ ] No duplicate activity cards for the same project/topic (RULE 5)
 - [ ] No fabricated facts; gaps/growth tied to missing data only
 - [ ] Layout matches selected style (or default blue style if `[design_preferences]` missing)
 - [ ] Colors follow selected theme (or default blue if `[design_preferences]` missing)

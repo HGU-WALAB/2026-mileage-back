@@ -7,11 +7,11 @@ You may freely choose CSS structure, class naming, spacing system, typography sc
 
 Recommended sections (omit empty sections automatically):
 - Header / Hero (이름 · 지원 직무 when `[job_info]` has 지원 직무)
-- About Me (짧게)
-- Core Tech Stack (증거 있는 스택만)
+- About Me (짧게) — RULE 10: 근거 없는 과장 수식어 금지
+- Core Tech Stack — **`[tech_stack]`의 NN% 전부 시각화**(RULE 8); 증거 없는 스택만 단정하지 않기
 - Featured Projects (최대 3개 강조 — 기간·역할·기여 라인이 있으면 카드 안에 불릿으로)
 - Technical Experience / 기타 프로젝트
-- Activities / Leadership
+- Activities / Leadership — RULE 9: 동일 주제 활동 병합
 - Awards / Certifications
 - Education / Mileage (압축)
 - Contact
@@ -22,6 +22,9 @@ Each **featured / project** entry must surface whenever present in STEP 2: 이�
 
 # STEP 7: QUALITY CHECKLIST (silent, before output)
 - [ ] No fabricated information
+- [ ] `[tech_stack]` percentages shown wherever STEP 2 includes % (RULE 8)
+- [ ] Duplicate same-topic activities merged, not duplicated (RULE 9)
+- [ ] No unsupported hype phrases without repo/activity anchor (RULE 10)
 - [ ] `[job_info]` used only as emphasis hints (RULE 6)
 - [ ] Repo lines with 기간·팀·역할·기여 rendered readably when present (RULE 7)
 - [ ] Layout matches selected style (or default blue style if `[design_preferences]` missing)
