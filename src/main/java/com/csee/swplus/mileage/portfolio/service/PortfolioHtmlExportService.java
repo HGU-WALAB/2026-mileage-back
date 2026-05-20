@@ -151,7 +151,7 @@ public class PortfolioHtmlExportService {
      */
     public String buildFullPrompt(Users user) {
         String inputData = buildPromptInputData(user);
-        return cvPromptHead() + inputData + buildCvPromptTail(true);
+        return cvPromptHead() + inputData + "\n```\n\n" + buildCvPromptAfterStep2(true);
     }
 
     /**
@@ -159,6 +159,69 @@ public class PortfolioHtmlExportService {
      * Bio and tech stack are always included. Repos, mileage, activities are filtered by selected IDs.
      */
     public String buildCvPrompt(Users user, CvBuildPromptRequest request) {
+        return buildCvHtmlGenerationPrompt(user, request, false, null);
+    }
+
+    /**
+     * CV HTML prompt with optional STEP 0 chain-of-thought block (single-phase mode) and/or attached planner JSON (two-phase render).
+     */
+    public String buildCvHtmlGenerationPrompt(Users user, CvBuildPromptRequest request,
+            boolean prependStep0CoT, String portfolioPlanJsonOrNull) {
+        CompiledPortfolioPromptInput in = compileCvPortfolioInput(user, request);
+        return assembleCvHtmlPrompt(in, prependStep0CoT, portfolioPlanJsonOrNull);
+    }
+
+    /**
+     * Call 1 — planner only: STEP 2 body + instructions to emit a JSON section plan (no HTML).
+     */
+    public String buildCvPortfolioPlanPrompt(Users user, CvBuildPromptRequest request) {
+        CompiledPortfolioPromptInput in = compileCvPortfolioInput(user, request);
+        return promptLoader.load("shared/portfolio-plan-head-cv.txt")
+                + in.step2Body
+                + promptLoader.load("shared/portfolio-plan-tail.txt");
+    }
+
+    /**
+     * Reflective “archive” prompt: neutral tone, one-shot HTML, chronological/category ordering in STEP 2.
+     * Same data sources and selection IDs as {@link #buildCvPrompt}; uses archive prompt fragments only.
+     */
+    public String buildArchivePrompt(Users user, CvBuildPromptRequest request) {
+        return buildArchiveHtmlGenerationPrompt(user, request, false, null);
+    }
+
+    /**
+     * Archive HTML prompt with optional STEP 0 CoT and/or planner JSON attachment.
+     */
+    public String buildArchiveHtmlGenerationPrompt(Users user, CvBuildPromptRequest request,
+            boolean prependStep0CoT, String portfolioPlanJsonOrNull) {
+        CompiledPortfolioPromptInput in = compileArchivePortfolioInput(user, request);
+        return assembleArchiveHtmlPrompt(in, prependStep0CoT, portfolioPlanJsonOrNull);
+    }
+
+    /**
+     * Call 1 — archive planner prompt.
+     */
+    public String buildArchivePortfolioPlanPrompt(Users user, CvBuildPromptRequest request) {
+        CompiledPortfolioPromptInput in = compileArchivePortfolioInput(user, request);
+        return promptLoader.load("shared/portfolio-plan-head-archive.txt")
+                + in.step2Body
+                + promptLoader.load("shared/portfolio-plan-tail.txt");
+    }
+
+    /**
+     * STEP 2 fenced body plus whether legacy blue CSS should be embedded in STEP 5-A.
+     */
+    private static final class CompiledPortfolioPromptInput {
+        private final String step2Body;
+        private final boolean embedLegacyCss;
+
+        private CompiledPortfolioPromptInput(String step2Body, boolean embedLegacyCss) {
+            this.step2Body = step2Body;
+            this.embedLegacyCss = embedLegacyCss;
+        }
+    }
+
+    private CompiledPortfolioPromptInput compileCvPortfolioInput(Users user, CvBuildPromptRequest request) {
         java.util.Set<Long> repoIds = request.getSelected_repo_ids() != null
                 ? new java.util.HashSet<>(request.getSelected_repo_ids()) : java.util.Collections.emptySet();
         java.util.Set<Long> mileageIds = request.getSelected_mileage_ids() != null
@@ -202,7 +265,9 @@ public class PortfolioHtmlExportService {
         sb.append("[github_repos]\n");
         if (repos.getRepositories() != null) {
             for (RepoEntryResponse r : repos.getRepositories()) {
-                if (r.getId() == null || !repoIds.contains(r.getId())) continue;
+                if (r.getId() == null || !repoIds.contains(r.getId())) {
+                    continue;
+                }
                 appendGithubRepoPromptLines(sb, r);
             }
         }
@@ -211,7 +276,9 @@ public class PortfolioHtmlExportService {
         sb.append("[mileage_list]\n");
         if (mileage.getMileage() != null) {
             for (MileageEntryResponse m : mileage.getMileage()) {
-                if (m.getId() == null || !mileageIds.contains(m.getId())) continue;
+                if (m.getId() == null || !mileageIds.contains(m.getId())) {
+                    continue;
+                }
                 String sem = nullToEmpty(m.getSemester());
                 String cat = nullToEmpty(m.getCategoryName());
                 String sub = nullToEmpty(m.getSubitemName());
@@ -226,7 +293,9 @@ public class PortfolioHtmlExportService {
         sb.append("[activities]\n");
         if (activities.getActivities() != null) {
             for (ActivityResponse a : activities.getActivities()) {
-                if (a.getId() == null || !activityIds.contains(a.getId())) continue;
+                if (a.getId() == null || !activityIds.contains(a.getId())) {
+                    continue;
+                }
                 appendActivityPromptLine(sb, a);
             }
         }
@@ -239,14 +308,10 @@ public class PortfolioHtmlExportService {
         appendDesignPreferencesBlock(sb, request.getDesign_preferences());
 
         boolean embedLegacyCss = !hasEffectiveDesignPreferences(request.getDesign_preferences());
-        return cvPromptHead() + sb.toString() + buildCvPromptTail(embedLegacyCss);
+        return new CompiledPortfolioPromptInput(sb.toString(), embedLegacyCss);
     }
 
-    /**
-     * Reflective “archive” prompt: neutral tone, one-shot HTML, chronological/category ordering in STEP 2.
-     * Same data sources and selection IDs as {@link #buildCvPrompt}; uses archive prompt fragments only.
-     */
-    public String buildArchivePrompt(Users user, CvBuildPromptRequest request) {
+    private CompiledPortfolioPromptInput compileArchivePortfolioInput(Users user, CvBuildPromptRequest request) {
         Set<Long> repoIds = request.getSelected_repo_ids() != null
                 ? new HashSet<>(request.getSelected_repo_ids()) : Collections.emptySet();
         Set<Long> mileageIds = request.getSelected_mileage_ids() != null
@@ -353,7 +418,43 @@ public class PortfolioHtmlExportService {
         appendDesignPreferencesBlock(sb, request.getDesign_preferences());
 
         boolean embedLegacyCss = !hasEffectiveDesignPreferences(request.getDesign_preferences());
-        return archivePromptHead() + sb.toString() + buildArchivePromptTail(embedLegacyCss);
+        return new CompiledPortfolioPromptInput(sb.toString(), embedLegacyCss);
+    }
+
+    private String assembleCvHtmlPrompt(CompiledPortfolioPromptInput in,
+            boolean prependStep0CoT, String portfolioPlanJsonOrNull) {
+        StringBuilder out = new StringBuilder(cvPromptHead());
+        if (prependStep0CoT) {
+            out.append(promptLoader.load("cv/step0-cot.txt"));
+        }
+        out.append(in.step2Body);
+        out.append("\n```\n\n");
+        if (portfolioPlanJsonOrNull != null && !portfolioPlanJsonOrNull.trim().isEmpty()) {
+            out.append("# PORTFOLIO_PLAN_JSON (authoritative outline — obey structure; every fact MUST exist in STEP 2)\n");
+            out.append("```json\n");
+            out.append(portfolioPlanJsonOrNull.trim());
+            out.append("\n```\n\n");
+        }
+        out.append(buildCvPromptAfterStep2(in.embedLegacyCss));
+        return out.toString();
+    }
+
+    private String assembleArchiveHtmlPrompt(CompiledPortfolioPromptInput in,
+            boolean prependStep0CoT, String portfolioPlanJsonOrNull) {
+        StringBuilder out = new StringBuilder(archivePromptHead());
+        if (prependStep0CoT) {
+            out.append(promptLoader.load("archive/step0-cot.txt"));
+        }
+        out.append(in.step2Body);
+        out.append("\n```\n\n");
+        if (portfolioPlanJsonOrNull != null && !portfolioPlanJsonOrNull.trim().isEmpty()) {
+            out.append("# PORTFOLIO_PLAN_JSON (authoritative outline — obey structure; every fact MUST exist in STEP 2)\n");
+            out.append("```json\n");
+            out.append(portfolioPlanJsonOrNull.trim());
+            out.append("\n```\n\n");
+        }
+        out.append(buildArchivePromptAfterStep2(in.embedLegacyCss));
+        return out.toString();
     }
 
     private String repoDisplayDescription(RepoEntryResponse r) {
@@ -371,9 +472,10 @@ public class PortfolioHtmlExportService {
         return promptLoader.load("archive/head.txt");
     }
 
-    private String buildCvPromptTail(boolean embedLegacyCss) {
+    /** STEP 3–7 fragments after the STEP 2 closing fence (call {@link #assembleCvHtmlPrompt} for full document). */
+    private String buildCvPromptAfterStep2(boolean embedLegacyCss) {
         String css = promptLoader.defaultBlueCss();
-        StringBuilder tail = new StringBuilder("\n```\n\n");
+        StringBuilder tail = new StringBuilder();
         tail.append(promptLoader.load("cv/step3-rules.txt"));
         tail.append(promptLoader.load("cv/step4-design.txt"));
         tail.append(promptLoader.load("cv/step5-intro.txt"));
@@ -382,15 +484,17 @@ public class PortfolioHtmlExportService {
                     .replace("{{CSS}}", css)
                     .replace("{{HTML_TITLE}}", "[name] · Portfolio"));
         } else {
-            tail.append(promptLoader.load("shared/step5a-skip-custom-design.txt"));
+            String snippet = promptLoader.load("shared/step5-css-minimum-snippet.txt");
+            tail.append(promptLoader.load("shared/step5a-skip-custom-design.txt")
+                    .replace("{{CSS_MINIMUM_SNIPPET}}", snippet));
         }
         tail.append(promptLoader.load("cv/step5b-through-step7.txt"));
         return tail.toString();
     }
 
-    private String buildArchivePromptTail(boolean embedLegacyCss) {
+    private String buildArchivePromptAfterStep2(boolean embedLegacyCss) {
         String css = promptLoader.defaultBlueCss();
-        StringBuilder tail = new StringBuilder("\n```\n\n");
+        StringBuilder tail = new StringBuilder();
         tail.append(promptLoader.load("archive/step3-rules.txt"));
         tail.append(promptLoader.load("archive/step4-design.txt"));
         tail.append(promptLoader.load("archive/step5-intro.txt"));
@@ -399,7 +503,9 @@ public class PortfolioHtmlExportService {
                     .replace("{{CSS}}", css)
                     .replace("{{HTML_TITLE}}", "[name] · Reflection Profile"));
         } else {
-            tail.append(promptLoader.load("shared/step5a-skip-custom-design.txt"));
+            String snippet = promptLoader.load("shared/step5-css-minimum-snippet.txt");
+            tail.append(promptLoader.load("shared/step5a-skip-custom-design.txt")
+                    .replace("{{CSS_MINIMUM_SNIPPET}}", snippet));
         }
         tail.append(promptLoader.load("archive/step5b-through-step7.txt"));
         return tail.toString();
