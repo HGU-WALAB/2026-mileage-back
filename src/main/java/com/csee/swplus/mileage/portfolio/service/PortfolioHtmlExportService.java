@@ -1,6 +1,7 @@
 package com.csee.swplus.mileage.portfolio.service;
 
 import com.csee.swplus.mileage.portfolio.dto.*;
+import com.csee.swplus.mileage.portfolio.prompt.PortfolioPromptLoader;
 import com.csee.swplus.mileage.profile.entity.Profile;
 import com.csee.swplus.mileage.profile.repository.ProfileRepository;
 import com.csee.swplus.mileage.user.entity.Users;
@@ -30,10 +31,8 @@ import java.util.stream.Collectors;
  * **blueStyle** layout: sidebar (name, role, school, meta-line, summary-chip, tech pills, contact) +
  * main (About, Projects, Mileage & extracurricular timeline, optional Achievements, Activities, footer).
  *
- * <p>LLM prompts ({@link #buildCvPromptTail()}, {@link #buildArchivePromptTail()}) embed {@link #CSS} as the
- * **default fallback style** (used when no {@code [design_preferences]} block is provided in STEP 2 — i.e. the
- * legacy blueStyle look is preserved). When {@code [design_preferences]} is provided, the LLM picks layout /
- * color theme / density dynamically per STEP 4 and is allowed to write its own CSS per STEP 5-B.
+ * <p>LLM prompts load fragments from {@code classpath:prompts/} via {@link PortfolioPromptLoader}.
+ * Verbatim default blue CSS is embedded **only** when STEP 2 has no effective {@code [design_preferences]}.
  */
 @Service
 @RequiredArgsConstructor
@@ -43,6 +42,7 @@ public class PortfolioHtmlExportService {
 
     private final PortfolioService portfolioService;
     private final ProfileRepository profileRepository;
+    private final PortfolioPromptLoader promptLoader;
 
     /**
      * Must match {@code server.servlet.context-path} (e.g. {@code /milestone25}) so export {@code img} URLs
@@ -111,18 +111,7 @@ public class PortfolioHtmlExportService {
         sb.append("[github_repos]\n");
         if (repos.getRepositories() != null) {
             for (RepoEntryResponse r : repos.getRepositories()) {
-                String title = r.getCustom_title() != null && !r.getCustom_title().isEmpty()
-                        ? r.getCustom_title()
-                        : r.getGithub_title();
-                if (title == null) title = "Repository";
-                String desc = repoDisplayDescription(r);
-                String langStr = formatRepoLanguages(r);
-                if (!langStr.isEmpty()) langStr = " (" + langStr + ")";
-                String commitStr = (r.getCommit_count() != null) ? " " + r.getCommit_count() + " commits" : "";
-                String starStr = (r.getStargazers_count() != null) ? " " + r.getStargazers_count() + " stars" : "";
-                String forkStr = (r.getForks_count() != null) ? " " + r.getForks_count() + " forks" : "";
-                sb.append("- ").append(title).append(" - ").append(desc).append(langStr).append(commitStr).append(starStr).append(forkStr).append("\n");
-                if (r.getHtml_url() != null) sb.append(r.getHtml_url()).append("\n");
+                appendGithubRepoPromptLines(sb, r);
             }
         }
         sb.append("\n");
@@ -162,7 +151,7 @@ public class PortfolioHtmlExportService {
      */
     public String buildFullPrompt(Users user) {
         String inputData = buildPromptInputData(user);
-        return PROMPT_HEAD + inputData + buildCvPromptTail();
+        return cvPromptHead() + inputData + buildCvPromptTail(true);
     }
 
     /**
@@ -214,18 +203,7 @@ public class PortfolioHtmlExportService {
         if (repos.getRepositories() != null) {
             for (RepoEntryResponse r : repos.getRepositories()) {
                 if (r.getId() == null || !repoIds.contains(r.getId())) continue;
-                String title = r.getCustom_title() != null && !r.getCustom_title().isEmpty()
-                        ? r.getCustom_title()
-                        : r.getGithub_title();
-                if (title == null) title = "Repository";
-                String desc = repoDisplayDescription(r);
-                String langStr = formatRepoLanguages(r);
-                if (!langStr.isEmpty()) langStr = " (" + langStr + ")";
-                String commitStr = (r.getCommit_count() != null) ? " " + r.getCommit_count() + " commits" : "";
-                String starStr = (r.getStargazers_count() != null) ? " " + r.getStargazers_count() + " stars" : "";
-                String forkStr = (r.getForks_count() != null) ? " " + r.getForks_count() + " forks" : "";
-                sb.append("- ").append(title).append(" - ").append(desc).append(langStr).append(commitStr).append(starStr).append(forkStr).append("\n");
-                if (r.getHtml_url() != null) sb.append(r.getHtml_url()).append("\n");
+                appendGithubRepoPromptLines(sb, r);
             }
         }
         sb.append("\n");
@@ -260,12 +238,13 @@ public class PortfolioHtmlExportService {
 
         appendDesignPreferencesBlock(sb, request.getDesign_preferences());
 
-        return PROMPT_HEAD + sb.toString() + buildCvPromptTail();
+        boolean embedLegacyCss = !hasEffectiveDesignPreferences(request.getDesign_preferences());
+        return cvPromptHead() + sb.toString() + buildCvPromptTail(embedLegacyCss);
     }
 
     /**
      * Reflective “archive” prompt: neutral tone, one-shot HTML, chronological/category ordering in STEP 2.
-     * Same data sources and selection IDs as {@link #buildCvPrompt}; uses {@link #ARCHIVE_PROMPT_HEAD} / {@link #buildArchivePromptTail()} only.
+     * Same data sources and selection IDs as {@link #buildCvPrompt}; uses archive prompt fragments only.
      */
     public String buildArchivePrompt(Users user, CvBuildPromptRequest request) {
         Set<Long> repoIds = request.getSelected_repo_ids() != null
@@ -363,18 +342,7 @@ public class PortfolioHtmlExportService {
 
         sb.append("[github_repos]\n");
         for (RepoEntryResponse r : repoList) {
-            String title = r.getCustom_title() != null && !r.getCustom_title().isEmpty()
-                    ? r.getCustom_title()
-                    : r.getGithub_title();
-            if (title == null) title = "Repository";
-            String desc = repoDisplayDescription(r);
-            String langStr = formatRepoLanguages(r);
-            if (!langStr.isEmpty()) langStr = " (" + langStr + ")";
-            String commitStr = (r.getCommit_count() != null) ? " " + r.getCommit_count() + " commits" : "";
-            String starStr = (r.getStargazers_count() != null) ? " " + r.getStargazers_count() + " stars" : "";
-            String forkStr = (r.getForks_count() != null) ? " " + r.getForks_count() + " forks" : "";
-            sb.append("- ").append(title).append(" - ").append(desc).append(langStr).append(commitStr).append(starStr).append(forkStr).append("\n");
-            if (r.getHtml_url() != null) sb.append(r.getHtml_url()).append("\n");
+            appendGithubRepoPromptLines(sb, r);
         }
         sb.append("\n");
 
@@ -384,7 +352,8 @@ public class PortfolioHtmlExportService {
 
         appendDesignPreferencesBlock(sb, request.getDesign_preferences());
 
-        return ARCHIVE_PROMPT_HEAD + sb.toString() + buildArchivePromptTail();
+        boolean embedLegacyCss = !hasEffectiveDesignPreferences(request.getDesign_preferences());
+        return archivePromptHead() + sb.toString() + buildArchivePromptTail(embedLegacyCss);
     }
 
     private String repoDisplayDescription(RepoEntryResponse r) {
@@ -392,6 +361,176 @@ public class PortfolioHtmlExportService {
             return "";
         }
         return r.getDescription().trim();
+    }
+
+    private String cvPromptHead() {
+        return promptLoader.load("cv/head.txt");
+    }
+
+    private String archivePromptHead() {
+        return promptLoader.load("archive/head.txt");
+    }
+
+    private String buildCvPromptTail(boolean embedLegacyCss) {
+        String css = promptLoader.defaultBlueCss();
+        StringBuilder tail = new StringBuilder("\n```\n\n");
+        tail.append(promptLoader.load("cv/step3-rules.txt"));
+        tail.append(promptLoader.load("cv/step4-design.txt"));
+        tail.append(promptLoader.load("cv/step5-intro.txt"));
+        if (embedLegacyCss) {
+            tail.append(promptLoader.load("shared/step5a-legacy-cv.txt")
+                    .replace("{{CSS}}", css)
+                    .replace("{{HTML_TITLE}}", "[name] · Portfolio"));
+        } else {
+            tail.append(promptLoader.load("shared/step5a-skip-custom-design.txt"));
+        }
+        tail.append(promptLoader.load("cv/step5b-through-step7.txt"));
+        return tail.toString();
+    }
+
+    private String buildArchivePromptTail(boolean embedLegacyCss) {
+        String css = promptLoader.defaultBlueCss();
+        StringBuilder tail = new StringBuilder("\n```\n\n");
+        tail.append(promptLoader.load("archive/step3-rules.txt"));
+        tail.append(promptLoader.load("archive/step4-design.txt"));
+        tail.append(promptLoader.load("archive/step5-intro.txt"));
+        if (embedLegacyCss) {
+            tail.append(promptLoader.load("shared/step5a-legacy-archive.txt")
+                    .replace("{{CSS}}", css)
+                    .replace("{{HTML_TITLE}}", "[name] · Reflection Profile"));
+        } else {
+            tail.append(promptLoader.load("shared/step5a-skip-custom-design.txt"));
+        }
+        tail.append(promptLoader.load("archive/step5b-through-step7.txt"));
+        return tail.toString();
+    }
+
+    private static boolean hasEffectiveDesignPreferences(DesignPreferencesDto p) {
+        if (p == null) {
+            return false;
+        }
+        return nonBlank(p.getLayout()) || nonBlank(p.getColor_theme())
+                || nonBlank(p.getDensity()) || nonBlank(p.getAdditional_notes());
+    }
+
+    private static boolean nonBlank(String s) {
+        return s != null && !s.trim().isEmpty();
+    }
+
+    private void appendGithubRepoPromptLines(StringBuilder sb, RepoEntryResponse r) {
+        String title = r.getCustom_title() != null && !r.getCustom_title().isEmpty()
+                ? r.getCustom_title()
+                : r.getGithub_title();
+        if (title == null) {
+            title = "Repository";
+        }
+        sb.append("- ").append(title).append("\n");
+        String period = formatRepoPeriodForPrompt(r.getDuration());
+        if (!period.isEmpty()) {
+            sb.append("  · 기간: ").append(period).append("\n");
+        }
+        String desc = repoDisplayDescription(r);
+        if (!desc.isEmpty()) {
+            sb.append("  · 설명: ").append(desc).append("\n");
+        }
+        String langs = formatRepoLanguages(r);
+        if (!langs.isEmpty()) {
+            sb.append("  · 기술: ").append(langs).append("\n");
+        }
+        String team = formatTeamCompositionForPrompt(r.getTeam_composition());
+        if (!team.isEmpty()) {
+            sb.append("  · 팀 구성: ").append(team).append("\n");
+        }
+        String myRole = formatMyRoleForPrompt(r.getMy_role());
+        if (!myRole.isEmpty()) {
+            sb.append("  · 내 역할: ").append(myRole).append("\n");
+        }
+        if (r.getKey_contributions() != null && !r.getKey_contributions().trim().isEmpty()) {
+            sb.append("  · 주요 기여:\n");
+            for (String line : r.getKey_contributions().trim().split("\\r?\\n")) {
+                String t = line.trim();
+                if (!t.isEmpty()) {
+                    sb.append("    - ").append(t).append("\n");
+                }
+            }
+        }
+        StringBuilder metaBits = new StringBuilder();
+        if (r.getCommit_count() != null) {
+            metaBits.append(r.getCommit_count()).append(" commits ");
+        }
+        if (r.getStargazers_count() != null) {
+            metaBits.append(r.getStargazers_count()).append(" stars ");
+        }
+        if (r.getForks_count() != null) {
+            metaBits.append(r.getForks_count()).append(" forks ");
+        }
+        String meta = metaBits.toString().trim();
+        if (!meta.isEmpty()) {
+            sb.append("  · ").append(meta).append("\n");
+        }
+        if (r.getHtml_url() != null && !r.getHtml_url().trim().isEmpty()) {
+            sb.append(r.getHtml_url().trim()).append("\n");
+        }
+    }
+
+    private static String formatRepoPeriodForPrompt(DurationDto d) {
+        if (d == null) {
+            return "";
+        }
+        String start = firstNonBlank(d.getStarted_at(), d.getStarted_at_github());
+        String end = firstNonBlank(d.getUpdated_at(), d.getUpdated_at_github());
+        if (start.isEmpty() && end.isEmpty()) {
+            return "";
+        }
+        if (start.isEmpty()) {
+            return "~ " + end;
+        }
+        if (end.isEmpty()) {
+            return start + " ~";
+        }
+        return start + " ~ " + end;
+    }
+
+    private static String firstNonBlank(String a, String b) {
+        if (a != null && !a.trim().isEmpty()) {
+            return a.trim();
+        }
+        if (b != null && !b.trim().isEmpty()) {
+            return b.trim();
+        }
+        return "";
+    }
+
+    private static String formatTeamCompositionForPrompt(List<TeamRoleDto> team) {
+        if (team == null || team.isEmpty()) {
+            return "";
+        }
+        List<String> parts = new ArrayList<>();
+        for (TeamRoleDto tr : team) {
+            if (tr == null || tr.getRole() == null || tr.getRole().trim().isEmpty() || tr.getCount() == null) {
+                continue;
+            }
+            parts.add(tr.getRole().trim() + "×" + tr.getCount());
+        }
+        return parts.isEmpty() ? "" : String.join(", ", parts);
+    }
+
+    private static String formatMyRoleForPrompt(MyRoleDto m) {
+        if (m == null) {
+            return "";
+        }
+        String role = m.getRole() != null ? m.getRole().trim() : "";
+        Integer pct = m.getContribution_percent();
+        if (!role.isEmpty() && pct != null) {
+            return role + " (" + pct + "%)";
+        }
+        if (!role.isEmpty()) {
+            return role;
+        }
+        if (pct != null) {
+            return "기여도 " + pct + "%";
+        }
+        return "";
     }
 
     private String nullToEmpty(Object o) {
@@ -580,7 +719,7 @@ public class PortfolioHtmlExportService {
         sb.append("  <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin />\n");
         sb.append("  <link href=\"https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap\" rel=\"stylesheet\" />\n");
         sb.append("  <style>\n");
-        sb.append(CSS);
+        sb.append(promptLoader.defaultBlueCss());
         sb.append("\n  </style>\n</head>\n<body>\n");
 
         sb.append("  <div class=\"page\">\n");
@@ -1302,438 +1441,4 @@ public class PortfolioHtmlExportService {
         return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
     }
 
-    private static final String PROMPT_HEAD =
-            "# ROLE\n"
-            + "You are an expert career coach and frontend developer specializing in creating recruiter-optimized portfolio websites for entry-level CS students in Korea. You have reviewed 10,000+ CS student resumes and know exactly what hiring managers look for in the first 30 seconds.\n\n"
-            + "---\n\n"
-            + "# TASK\n"
-            + "Generate a single-file HTML portfolio for a CS student based strictly on the input data provided.\n\n"
-            + "The design direction, color palette, typography style, spacing system, layout structure, and visual style are NOT predetermined. You must decide them dynamically based on:\n"
-            + "- the user's `[design_preferences]` block in STEP 2 (when provided)\n"
-            + "- the applicant's target role\n"
-            + "- project characteristics\n"
-            + "- professionalism required for Korean hiring culture\n"
-            + "- readability\n"
-            + "- recruiter usability\n"
-            + "- print friendliness\n\n"
-            + "If the `[design_preferences]` block is missing or empty, fall back to the **default blue style** described in STEP 5-A (verbatim CSS + body skeleton).\n\n"
-            + "The final output must remain: clean, professional, recruiter-friendly, easy to scan, responsive, printable, and readable in Korean.\n\n"
-            + "---\n\n"
-            + "# STEP 1: ONE-SHOT\n"
-            + "Do **not** ask clarifying questions. Do **not** wait for confirmation. Do **not** simulate a chat. Read STEP 2 and output the HTML in this single response.\n\n"
-            + "---\n\n"
-            + "# STEP 2: INPUT DATA (User fills this in)\n\n"
-            + "```\n";
-
-    private String buildCvPromptTail() {
-        return "\n```\n\n"
-                + "---\n\n"
-                + "# STEP 3: GENERATION RULES — MUST FOLLOW ALL\n\n"
-                + "## RULE 1: Strict Priority Order\n"
-                + "Feature content in this order. Skip silently if empty:\n"
-                + "1. GitHub repos + 산학 프로젝트 — Real artifacts, highest credibility\n"
-                + "2. 전공 교과/비교과 — Technical depth\n"
-                + "3. Activities + 대외 활동 — Collaboration, leadership\n"
-                + "4. Bio — Minimal, concise summary only\n\n"
-                + "## RULE 2: Zero Fabrication Policy\n"
-                + "- NEVER invent metrics, links, dates, awards, or project details not explicitly provided\n"
-                + "- Empty fields → omit section entirely (no placeholders)\n"
-                + "- Do not infer technologies not directly mentioned\n"
-                + "- Do not fabricate team size or contribution scope\n\n"
-                + "## RULE 3: Language Calibration\n"
-                + "| Raw Input | Rewrite Style |\n"
-                + "|---|---|\n"
-                + "| \"열심히 했다\" | \"[기술명]을 활용해 [기능] 구현\" |\n"
-                + "| \"공부했다\" | \"[기술명] 학습 및 적용\" |\n"
-                + "| \"팀장을 맡았다\" | \"팀 리드로서 [담당 역할] 수행\" |\n"
-                + "| 모호한 표현 | 구체적인 기술 중심 표현으로 정리 |\n\n"
-                + "Use concise recruiter-oriented Korean writing.\n\n"
-                + "## RULE 4: Honesty & Scope Rules\n"
-                + "- Always distinguish: 개인 프로젝트 / 팀 프로젝트 / 담당 역할\n"
-                + "- Do not claim \"Full Stack\" unless both frontend and backend evidence exist\n"
-                + "- Only display tech stack demonstrated in: 프로젝트, 수업, 활동, 연구\n"
-                + "- Do not exaggerate production-level experience\n\n"
-                + "## RULE 5: Achievement Priority\n"
-                + "Awards, certifications, and notable achievements must appear prominently. "
-                + "Examples: 해커톤 대상, SQLD, OPIc, 공모전 수상. If a prize tier exists, preserve it exactly (대상 / 최우수 / 우수 등).\n\n"
-                + "---\n\n"
-                + "# STEP 4: USER-SELECTED DESIGN OPTIONS\n\n"
-                + "The portfolio design MUST adapt based on the user-selected options in `[design_preferences]`.\n"
-                + "If the `[design_preferences]` block is missing or empty, **skip STEP 4 entirely** and use the default blue style in STEP 5-A.\n\n"
-                + "## 4-A. Layout Style\n"
-                + "User may choose ONE of: 단일 칼럼 / 랜딩 페이지 / 사이드바 / 카드 그리드\n\n"
-                + "Layout guidelines:\n"
-                + "- 단일 칼럼: Resume/document style, vertical reading flow, print-friendly priority\n"
-                + "- 랜딩 페이지: Hero section emphasis, modern section transitions, project-first presentation\n"
-                + "- 사이드바: Persistent profile/info area, main content separated, traditional developer portfolio structure\n"
-                + "- 카드 그리드: Card-based modular sections, strong visual separation, suitable for project-heavy candidates\n\n"
-                + "## 4-B. Color Theme\n"
-                + "User may choose ONE of: indigo / emerald / slate / rose / amber / cyan\n\n"
-                + "Token system:\n"
-                + "```json\n"
-                + "{\n"
-                + "  \"indigo\":  { \"primary\": \"#6366F1\", \"secondary\": \"#818CF8\", \"soft\": \"#C7D2FE\" },\n"
-                + "  \"emerald\": { \"primary\": \"#10B981\", \"secondary\": \"#34D399\", \"soft\": \"#A7F3D0\" },\n"
-                + "  \"slate\":   { \"primary\": \"#334155\", \"secondary\": \"#64748B\", \"soft\": \"#CBD5E1\" },\n"
-                + "  \"rose\":    { \"primary\": \"#F43F5E\", \"secondary\": \"#FB7185\", \"soft\": \"#FFE4E6\" },\n"
-                + "  \"amber\":   { \"primary\": \"#F59E0B\", \"secondary\": \"#FBBF24\", \"soft\": \"#FEF3C7\" },\n"
-                + "  \"cyan\":    { \"primary\": \"#06B6D4\", \"secondary\": \"#22D3EE\", \"soft\": \"#CFFAFE\" }\n"
-                + "}\n"
-                + "```\n\n"
-                + "Color usage rules:\n"
-                + "- primary → headings / buttons / emphasis\n"
-                + "- secondary → hover / accents / gradients\n"
-                + "- soft → badge background / section tint / chips\n"
-                + "Do not introduce unrelated dominant colors.\n\n"
-                + "## 4-C. Density Mode\n"
-                + "- 1페이지 내: Compress spacing, prioritize strongest projects only, reduce verbose descriptions, optimize for A4 print\n"
-                + "- 페이지 제한 없음: Allow detailed descriptions, include additional activities/projects, more breathing room and spacing, richer section hierarchy\n\n"
-                + "## 4-D. Additional Custom Requests\n"
-                + "Reflect extra user customization (preferred emphasis areas, section reorder requests, wording preferences) unless they conflict with honesty, readability, accessibility, or print usability.\n\n"
-                + "---\n\n"
-                + "# STEP 5: HTML REQUIREMENTS\n\n"
-                + "The generated HTML MUST:\n"
-                + "- be fully self-contained (internal CSS only)\n"
-                + "- support responsive layout and print CSS\n"
-                + "- render Korean correctly (Noto Sans KR / Inter)\n"
-                + "- use semantic HTML; avoid unnecessary JS frameworks\n"
-                + "- maintain accessibility and recruiter readability\n\n"
-                + "## 5-A. Default Style (use ONLY when `[design_preferences]` is missing or empty)\n"
-                + "COPY THIS `<style>` BLOCK VERBATIM. Do not change any value, color, or class name.\n\n"
-                + "```html\n"
-                + "<style>\n"
-                + CSS
-                + "\n</style>\n"
-                + "```\n\n"
-                + "Use this `<head>`:\n"
-                + "```html\n"
-                + "<!DOCTYPE html>\n"
-                + "<html lang=\"ko\">\n"
-                + "<head>\n"
-                + "  <meta charset=\"UTF-8\" />\n"
-                + "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n"
-                + "  <title>[name] · Portfolio</title>\n"
-                + "  <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\" />\n"
-                + "  <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin />\n"
-                + "  <link href=\"https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap\" rel=\"stylesheet\" />\n"
-                + "  [PASTE THE VERBATIM <style> BLOCK FROM ABOVE HERE]\n"
-                + "</head>\n"
-                + "```\n\n"
-                + "Use this body skeleton with **exactly** these class names:\n"
-                + "```html\n"
-                + "<body>\n"
-                + "  <div class=\"page\">\n"
-                + "    <div class=\"card\">\n"
-                + "      <div class=\"card-inner\">\n"
-                + "        <aside class=\"sidebar\">\n"
-                + "          <div class=\"profile\">\n"
-                + "            <div class=\"name\">[이름]</div>\n"
-                + "            <div class=\"role\">[지망 직무/방향]</div>\n"
-                + "            <div class=\"school\">[학과]</div>\n"
-                + "            <div class=\"meta-line\">[학년/학기]</div>\n"
-                + "            <div class=\"summary-chip\"><span>[핵심 한줄]</span></div>\n"
-                + "            <div class=\"section\" style=\"margin-bottom:0;\">\n"
-                + "              <div class=\"section-header\" style=\"margin-bottom:6px;\">\n"
-                + "                <div class=\"section-marker\"></div>\n"
-                + "                <div><div class=\"section-title\" style=\"font-size:13px;\">TECH STACK</div></div>\n"
-                + "              </div>\n"
-                + "              <div class=\"pill-group\">\n"
-                + "                <div class=\"pill\">[tech1]</div>\n"
-                + "              </div>\n"
-                + "            </div>\n"
-                + "            <div class=\"contact-block\">\n"
-                + "              <div class=\"contact-label\">Contact</div>\n"
-                + "              <div class=\"contact-item\"><span class=\"icon\">📧</span><a href=\"mailto:[email]\">[email]</a></div>\n"
-                + "              <div class=\"contact-item\"><span class=\"icon\">🐙</span>\n"
-                + "                <a href=\"[github]\" class=\"link-chip\" target=\"_blank\" rel=\"noreferrer\">\n"
-                + "                  <span>GitHub</span><span>[github display]</span></a></div>\n"
-                + "            </div>\n"
-                + "          </div>\n"
-                + "        </aside>\n"
-                + "        <main class=\"main\">\n"
-                + "          <section class=\"section\">\n"
-                + "            <div class=\"section-header\">\n"
-                + "              <div class=\"section-marker\"></div>\n"
-                + "              <div>\n"
-                + "                <div class=\"section-title\">[SECTION TITLE]</div>\n"
-                + "                <div class=\"section-subtitle\">[subtitle]</div>\n"
-                + "              </div>\n"
-                + "            </div>\n"
-                + "            <div class=\"section-body\">\n"
-                + "              <!-- Prose: .about-text + <p> -->\n"
-                + "              <!-- Lists: .timeline + .timeline-item -->\n"
-                + "              <!-- Achievements: .achievements-box -->\n"
-                + "              <!-- Projects: .project-card -->\n"
-                + "            </div>\n"
-                + "          </section>\n"
-                + "          <footer>[footer text]</footer>\n"
-                + "        </main>\n"
-                + "      </div>\n"
-                + "    </div>\n"
-                + "  </div>\n"
-                + "</body>\n"
-                + "```\n\n"
-                + "## 5-B. Custom Style (use when `[design_preferences]` is provided)\n"
-                + "You may freely choose CSS structure, class naming, spacing system, typography scale, responsive behavior, and component structure — as long as they follow the selected layout, color theme, and density mode from STEP 4. Do **not** copy the default `<style>` from 5-A in this case.\n\n"
-                + "---\n\n"
-                + "# STEP 6: CONTENT STRUCTURE REQUIREMENTS\n\n"
-                + "Recommended sections (omit empty sections automatically):\n"
-                + "- Header / Hero\n"
-                + "- About Me\n"
-                + "- Core Tech Stack\n"
-                + "- Featured Projects (max 3 emphasized)\n"
-                + "- Technical Experience\n"
-                + "- Activities / Leadership\n"
-                + "- Awards / Certifications\n"
-                + "- Education\n"
-                + "- Contact\n\n"
-                + "Each project should contain: project name, concise description, technologies, contribution scope, and repository link (if exists).\n\n"
-                + "---\n\n"
-                + "# STEP 7: QUALITY CHECKLIST (silent, before output)\n"
-                + "- [ ] No fabricated information\n"
-                + "- [ ] Layout matches selected style (or default blue style if `[design_preferences]` missing)\n"
-                + "- [ ] Colors follow selected theme (or default blue if `[design_preferences]` missing)\n"
-                + "- [ ] Density mode respected\n"
-                + "- [ ] Korean readability maintained (Noto Sans KR)\n"
-                + "- [ ] Print stylesheet included\n"
-                + "- [ ] Responsive layout works\n"
-                + "- [ ] Important projects prioritized (max 3 emphasized)\n"
-                + "- [ ] Empty sections omitted\n"
-                + "- [ ] HTML is a single file, fully self-contained\n";
-    }
-
-    /** Archive / self-assessment prompt — never mix with {@link #PROMPT_HEAD}. */
-    private static final String ARCHIVE_PROMPT_HEAD =
-            "# ROLE\n"
-            + "You are a calm, honest mentor for CS students in Korea. Your job is to help them see their real progress, name strengths grounded in evidence, surface gaps visible from what is (and is not) in their data, and suggest realistic next steps — not to sell them to recruiters.\n\n"
-            + "---\n\n"
-            + "# TASK\n"
-            + "Generate a single-file, self-contained HTML page from STEP 2 only. Tone: neutral and reflective. The reader is the student themselves (and maybe an advisor), not a hiring manager.\n\n"
-            + "The design direction, color palette, typography, and layout are NOT predetermined. Decide them dynamically from the `[design_preferences]` block in STEP 2 (when provided). If `[design_preferences]` is missing or empty, fall back to the **default blue style** described in STEP 5-A.\n\n"
-            + "---\n\n"
-            + "# STEP 1: ONE-SHOT (Archive mode)\n"
-            + "Do **not** ask clarifying questions. Do **not** wait for confirmation. Do **not** simulate a chat. Read STEP 2 and output the HTML in this single response.\n\n"
-            + "---\n\n"
-            + "# STEP 2: INPUT DATA\n\n"
-            + "```\n";
-
-    private static final String CSS =
-            ":root{--bg:#f9fafb;--card-bg:#ffffff;--text-main:#111827;--text-sub:#4b5563;--accent:#2563eb;--accent-soft:#e5edff;--border:#e5e7eb;}"
-            + "*{box-sizing:border-box;margin:0;padding:0;}"
-            + "body{font-family:'Noto Sans KR','Inter',system-ui,-apple-system,BlinkMacSystemFont,sans-serif;background-color:var(--bg);color:var(--text-main);line-height:1.6;}"
-            + ".page{max-width:960px;margin:32px auto;padding:0 16px 40px;}"
-            + ".card{background-color:var(--card-bg);border-radius:16px;box-shadow:0 10px 30px rgba(15,23,42,0.08);border:1px solid rgba(148,163,184,0.25);overflow:hidden;}"
-            + ".card-inner{display:flex;flex-direction:row;}"
-            + ".sidebar{width:260px;background:radial-gradient(circle at top left,#e5edff 0,#ffffff 55%,#f9fafb 100%);border-right:1px solid rgba(148,163,184,0.25);padding:32px 24px;}"
-            + ".main{flex:1;padding:28px 32px 32px;}"
-            + ".profile-img{width:86px;height:86px;border-radius:24px;object-fit:cover;margin-bottom:14px;display:block;}"
-            + ".name{font-size:26px;font-weight:700;letter-spacing:-0.03em;margin-bottom:4px;color:#0f172a;}"
-            + ".role{font-size:14px;font-weight:600;color:var(--accent);margin-bottom:10px;}"
-            + ".school{font-size:13px;color:var(--text-sub);margin-bottom:4px;}"
-            + ".meta-line{font-size:12px;color:#6b7280;margin-bottom:16px;}"
-            + ".summary-chip{font-size:12px;color:#1d4ed8;background-color:var(--accent-soft);border-radius:999px;padding:5px 11px;display:inline-flex;align-items:center;gap:6px;margin-bottom:18px;}"
-            + ".summary-chip span{font-weight:600;}"
-            + ".contact-block{margin-top:16px;padding-top:12px;border-top:1px dashed rgba(148,163,184,0.6);}"
-            + ".contact-label{font-size:12px;font-weight:600;color:#6b7280;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;}"
-            + ".contact-item{font-size:13px;color:var(--text-main);display:flex;align-items:center;gap:8px;margin-bottom:6px;word-break:break-all;}"
-            + ".contact-item span.icon{font-size:14px;}"
-            + ".pill-group{display:flex;flex-wrap:wrap;gap:6px;}"
-            + ".pill{font-size:11px;font-weight:600;letter-spacing:0.03em;text-transform:uppercase;color:#1d4ed8;background-color:#e5edff;border-radius:999px;padding:4px 9px;border:1px solid rgba(37,99,235,0.18);}"
-            + ".section{margin-bottom:22px;}"
-            + ".section-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}"
-            + ".section-marker{width:4px;height:18px;border-radius:999px;background:linear-gradient(180deg,#2563eb,#4f46e5);}"
-            + ".section-title{font-size:15px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#111827;}"
-            + ".section-subtitle{font-size:12px;color:#9ca3af;letter-spacing:0.02em;text-transform:uppercase;}"
-            + ".section-body{font-size:13px;color:var(--text-main);}"
-            + ".about-text p + p{margin-top:6px;}"
-            + ".projects-grid{display:flex;flex-direction:column;gap:12px;}"
-            + ".project-card{background-color:#ffffff;border-radius:10px;border-left:3px solid var(--accent);border-right:1px solid rgba(148,163,184,0.35);border-top:1px solid rgba(148,163,184,0.25);border-bottom:1px solid rgba(148,163,184,0.35);padding:10px 12px 10px 14px;box-shadow:0 6px 14px rgba(15,23,42,0.06);}"
-            + ".project-header{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:4px;}"
-            + ".project-name{font-size:13px;font-weight:600;color:#0f172a;}"
-            + ".project-meta{font-size:11px;color:#6b7280;text-align:right;white-space:nowrap;}"
-            + ".project-desc{font-size:12px;color:#4b5563;margin-bottom:6px;}"
-            + ".project-footer{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:4px;}"
-            + ".stack-badges{display:flex;flex-wrap:wrap;gap:4px;}"
-            + ".stack-badge{font-size:11px;padding:3px 7px;border-radius:999px;background-color:#eff6ff;color:#1d4ed8;border:1px solid rgba(37,99,235,0.25);}"
-            + ".link-chip{font-size:11px;color:#1d4ed8;text-decoration:none;display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border-radius:999px;background-color:#eff6ff;border:1px solid rgba(37,99,235,0.25);}"
-            + ".link-chip span{font-size:11px;}"
-            + ".timeline{position:relative;padding-left:14px;margin-top:4px;}"
-            + ".timeline::before{content:'';position:absolute;left:4px;top:2px;bottom:4px;width:1px;background:linear-gradient(to bottom,#e5e7eb,#d1d5db);}"
-            + ".timeline-item{position:relative;padding-left:12px;margin-bottom:10px;}"
-            + ".timeline-dot{position:absolute;left:-2px;top:4px;width:7px;height:7px;border-radius:999px;background-color:var(--accent);box-shadow:0 0 0 3px #e5edff;}"
-            + ".timeline-title{font-size:12px;font-weight:600;color:#0f172a;}"
-            + ".timeline-date{font-size:11px;color:#6b7280;margin-top:1px;}"
-            + ".timeline-desc{font-size:12px;color:#4b5563;margin-top:2px;}"
-            + ".achievements-box{border-radius:10px;border:1px solid #fed7aa;background:#fffbeb;padding:10px 12px;}"
-            + ".achievements-title{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#92400e;margin-bottom:4px;}"
-            + ".achievements-list{font-size:12px;color:#7c2d12;padding-left:16px;}"
-            + "footer{margin-top:18px;font-size:11px;color:#6b7280;text-align:right;border-top:1px solid rgba(226,232,240,0.9);padding-top:8px;}"
-            + "footer a{color:#1d4ed8;text-decoration:none;margin-left:8px;}"
-            + "footer a:hover{text-decoration:underline;}"
-            + "@media (max-width:768px){.card-inner{flex-direction:column;}.sidebar{width:100%;border-right:none;border-bottom:1px solid rgba(148,163,184,0.25);}.main{padding:20px 18px 22px;}.name{font-size:22px;}.section{margin-bottom:18px;}.project-card{padding:9px 10px 9px 12px;}}"
-            + "@media print{body{background-color:#ffffff;}.page{margin:0;padding:0;}.card{box-shadow:none;border-radius:0;border:none;}.sidebar{border-right:1px solid #e5e7eb;}.project-card{box-shadow:none;}a{color:#000000;text-decoration:none;}}";
-
-    /**
-     * Archive prompt tail: embeds {@link #CSS} verbatim in STEP 5-A so the model copies the same stylesheet as
-     * server export when no {@code [design_preferences]} is provided. When preferences are provided, the model
-     * picks layout / color theme / density dynamically per STEP 4.
-     */
-    private String buildArchivePromptTail() {
-        return "\n```\n\n"
-                + "---\n\n"
-                + "# STEP 3: GENERATION RULES — MUST FOLLOW ALL\n\n"
-                + "## RULE 1: Ordering of evidence (match the narrative to STEP 2 section order)\n"
-                + "1. After intro/context, present **mileage_list** items in the order given (already sorted by semester, then category).\n"
-                + "2. Then **activities** in the order given (chronological by start date).\n"
-                + "3. Then **github_repos** in the order given (newest `updated_at` first when present).\n"
-                + "4. **Tech stack** and **bio** support the story; do not reorder STEP 2 blocks when quoting structure.\n\n"
-                + "## RULE 2: Honest reflection (not resume hype)\n"
-                + "- Describe what the data actually shows: what they did, what they likely learned, where evidence is thin.\n"
-                + "- Do **not** use recruiter-style puffery or the \"language calibration\" rewrite table from sales CVs.\n\n"
-                + "## RULE 3: Gaps and growth (evidence-bound)\n"
-                + "- Call out **gaps** only from what is missing, empty, or weak in STEP 2.\n"
-                + "- Suggest **growth areas** as concrete, student-appropriate next steps — not invented achievements.\n\n"
-                + "## RULE 4: Zero fabrication\n"
-                + "- Never invent metrics, employers, awards, or repos not in STEP 2.\n"
-                + "- If a section has no lines, omit it or note clearly that nothing was selected.\n\n"
-                + "---\n\n"
-                + "# STEP 4: USER-SELECTED DESIGN OPTIONS\n\n"
-                + "If the `[design_preferences]` block is missing or empty, **skip STEP 4 entirely** and use the default blue style in STEP 5-A.\n\n"
-                + "## 4-A. Layout Style\n"
-                + "User may choose ONE of: 단일 칼럼 / 랜딩 페이지 / 사이드바 / 카드 그리드\n\n"
-                + "Layout guidelines (reflective variant):\n"
-                + "- 단일 칼럼: Document/notebook style, vertical reading flow, print-friendly priority\n"
-                + "- 랜딩 페이지: Section-anchored sequence, soft transitions, intro-first presentation\n"
-                + "- 사이드바: Persistent profile/info area, main reflection separated\n"
-                + "- 카드 그리드: Card-based modular sections, strong visual separation\n\n"
-                + "## 4-B. Color Theme\n"
-                + "User may choose ONE of: indigo / emerald / slate / rose / amber / cyan\n\n"
-                + "Token system:\n"
-                + "```json\n"
-                + "{\n"
-                + "  \"indigo\":  { \"primary\": \"#6366F1\", \"secondary\": \"#818CF8\", \"soft\": \"#C7D2FE\" },\n"
-                + "  \"emerald\": { \"primary\": \"#10B981\", \"secondary\": \"#34D399\", \"soft\": \"#A7F3D0\" },\n"
-                + "  \"slate\":   { \"primary\": \"#334155\", \"secondary\": \"#64748B\", \"soft\": \"#CBD5E1\" },\n"
-                + "  \"rose\":    { \"primary\": \"#F43F5E\", \"secondary\": \"#FB7185\", \"soft\": \"#FFE4E6\" },\n"
-                + "  \"amber\":   { \"primary\": \"#F59E0B\", \"secondary\": \"#FBBF24\", \"soft\": \"#FEF3C7\" },\n"
-                + "  \"cyan\":    { \"primary\": \"#06B6D4\", \"secondary\": \"#22D3EE\", \"soft\": \"#CFFAFE\" }\n"
-                + "}\n"
-                + "```\n\n"
-                + "Color usage rules:\n"
-                + "- primary → headings / emphasis\n"
-                + "- secondary → hover / accents / gradients\n"
-                + "- soft → badge background / section tint / chips\n"
-                + "Do not introduce unrelated dominant colors.\n\n"
-                + "## 4-C. Density Mode\n"
-                + "- 1페이지 내: Compress spacing, prioritize strongest evidence, reduce verbose descriptions, optimize for A4 print\n"
-                + "- 페이지 제한 없음: Allow detailed reflection, include additional notes, more breathing room and spacing\n\n"
-                + "## 4-D. Additional Custom Requests\n"
-                + "Reflect extra user customization unless they conflict with honesty, readability, accessibility, or print usability.\n\n"
-                + "---\n\n"
-                + "# STEP 5: HTML REQUIREMENTS\n\n"
-                + "The generated HTML MUST:\n"
-                + "- be fully self-contained (internal CSS only)\n"
-                + "- support responsive layout and print CSS\n"
-                + "- render Korean correctly (Noto Sans KR / Inter)\n"
-                + "- use semantic HTML; avoid unnecessary JS frameworks\n\n"
-                + "## 5-A. Default Style (use ONLY when `[design_preferences]` is missing or empty)\n"
-                + "COPY THIS `<style>` BLOCK VERBATIM. Do not change any value, color, or class name.\n\n"
-                + "```html\n"
-                + "<style>\n"
-                + CSS
-                + "\n</style>\n"
-                + "```\n\n"
-                + "Use this `<head>`:\n"
-                + "```html\n"
-                + "<!DOCTYPE html>\n"
-                + "<html lang=\"ko\">\n"
-                + "<head>\n"
-                + "  <meta charset=\"UTF-8\" />\n"
-                + "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n"
-                + "  <title>[name] · Reflection Profile</title>\n"
-                + "  <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\" />\n"
-                + "  <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin />\n"
-                + "  <link href=\"https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap\" rel=\"stylesheet\" />\n"
-                + "  [PASTE THE VERBATIM <style> BLOCK FROM ABOVE HERE]\n"
-                + "</head>\n"
-                + "```\n\n"
-                + "Use this body skeleton with **exactly** these class names:\n"
-                + "```html\n"
-                + "<body>\n"
-                + "  <div class=\"page\">\n"
-                + "    <div class=\"card\">\n"
-                + "      <div class=\"card-inner\">\n"
-                + "        <aside class=\"sidebar\">\n"
-                + "          <div class=\"profile\">\n"
-                + "            <div class=\"name\">[이름]</div>\n"
-                + "            <div class=\"role\">[직무/방향]</div>\n"
-                + "            <div class=\"school\">[학과]</div>\n"
-                + "            <div class=\"meta-line\">[학년/학기]</div>\n"
-                + "            <div class=\"summary-chip\"><span>[핵심 한줄]</span></div>\n"
-                + "            <div class=\"section\" style=\"margin-bottom:0;\">\n"
-                + "              <div class=\"section-header\" style=\"margin-bottom:6px;\">\n"
-                + "                <div class=\"section-marker\"></div>\n"
-                + "                <div><div class=\"section-title\" style=\"font-size:13px;\">TECH STACK</div></div>\n"
-                + "              </div>\n"
-                + "              <div class=\"pill-group\">\n"
-                + "                <div class=\"pill\">[tech1]</div>\n"
-                + "              </div>\n"
-                + "            </div>\n"
-                + "            <div class=\"contact-block\">\n"
-                + "              <div class=\"contact-label\">Contact</div>\n"
-                + "              <div class=\"contact-item\"><span class=\"icon\">📧</span><a href=\"mailto:[email]\">[email]</a></div>\n"
-                + "              <div class=\"contact-item\"><span class=\"icon\">🐙</span>\n"
-                + "                <a href=\"[github]\" class=\"link-chip\" target=\"_blank\" rel=\"noreferrer\">\n"
-                + "                  <span>GitHub</span><span>[github display]</span></a></div>\n"
-                + "            </div>\n"
-                + "          </div>\n"
-                + "        </aside>\n"
-                + "        <main class=\"main\">\n"
-                + "          <section class=\"section\">\n"
-                + "            <div class=\"section-header\">\n"
-                + "              <div class=\"section-marker\"></div>\n"
-                + "              <div>\n"
-                + "                <div class=\"section-title\">[SECTION TITLE]</div>\n"
-                + "                <div class=\"section-subtitle\">[subtitle]</div>\n"
-                + "              </div>\n"
-                + "            </div>\n"
-                + "            <div class=\"section-body\">\n"
-                + "              <!-- prose → .about-text + <p> | lists → .timeline + .timeline-item | gaps/highlights → .achievements-box | projects → .project-card -->\n"
-                + "            </div>\n"
-                + "          </section>\n"
-                + "          <footer>[footer text]</footer>\n"
-                + "        </main>\n"
-                + "      </div>\n"
-                + "    </div>\n"
-                + "  </div>\n"
-                + "</body>\n"
-                + "```\n\n"
-                + "Section titles may be renamed for reflective tone (e.g. \"STRENGTHS\", \"GAPS & NEXT STEPS\", \"TECH EVIDENCE\") but **never change class names** when using the default style.\n\n"
-                + "## 5-B. Custom Style (use when `[design_preferences]` is provided)\n"
-                + "You may freely choose CSS structure, class naming, spacing system, typography scale, responsive behavior, and component structure — as long as they follow the selected layout, color theme, and density mode from STEP 4. Do **not** copy the default `<style>` from 5-A in this case.\n\n"
-                + "---\n\n"
-                + "# STEP 6: CONTENT STRUCTURE REQUIREMENTS\n\n"
-                + "Recommended reflective sections (omit empty sections automatically):\n"
-                + "- Header / Intro\n"
-                + "- About Me (reflective)\n"
-                + "- Tech Evidence\n"
-                + "- Activities / Experience (chronological)\n"
-                + "- Coursework & Mileage\n"
-                + "- Projects & Repos\n"
-                + "- Strengths\n"
-                + "- Gaps & Next Steps\n"
-                + "- Contact\n\n"
-                + "---\n\n"
-                + "# STEP 7: QUALITY CHECKLIST (silent, before output)\n"
-                + "- [ ] One-shot: no questions to the user\n"
-                + "- [ ] Tone is reflective, not resume hype\n"
-                + "- [ ] No fabricated facts; gaps/growth tied to missing data only\n"
-                + "- [ ] Layout matches selected style (or default blue style if `[design_preferences]` missing)\n"
-                + "- [ ] Colors follow selected theme (or default blue if `[design_preferences]` missing)\n"
-                + "- [ ] Density mode respected\n"
-                + "- [ ] Korean readability maintained (Noto Sans KR)\n"
-                + "- [ ] Print stylesheet included\n"
-                + "- [ ] Empty sections omitted\n"
-                + "- [ ] HTML is a single file, fully self-contained\n";
-    }
 }
