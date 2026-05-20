@@ -28,7 +28,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Thin OpenAI Chat Completions wrapper for CV HTML generation.
+ * Thin OpenAI Chat Completions wrapper for CV HTML generation (single HTML call or **plan JSON + HTML** two-phase).
  * <p>
  * No reactive / SDK dependency — uses {@link RestTemplate} configured with read/connect timeouts from
  * {@code openai.api.timeout-seconds}. Returns structured {@link Result} (html + token usage + model name)
@@ -57,10 +57,19 @@ public class OpenAiClient {
                     + "or chat preamble before or after the HTML. The first character of your response MUST be "
                     + "'<' and the last must be '>'.";
 
+    /**
+     * Call 1 — JSON-only section planner. Output must be a single JSON object (optionally wrapped in {@code ```json}).
+     */
+    private static final String SYSTEM_PORTFOLIO_PLAN_PROMPT =
+            "You are a structured planning assistant for portfolio HTML generation. Read ONLY the user's STEP 2 data "
+                    + "block and return EXACTLY ONE JSON object — valid UTF-8 JSON, no comments, no trailing prose. "
+                    + "Do NOT invent employers, metrics, dates, awards, or technologies not present in the data. "
+                    + "If no markdown fences are required: output raw JSON only.";
     private final String apiKey;
     private final String defaultModel;
     private final String baseUrl;
     private final int maxOutputTokens;
+    private final int portfolioPlanMaxOutputTokens;
     private final double temperature;
     private final RestTemplate restTemplate;
 
@@ -70,6 +79,7 @@ public class OpenAiClient {
             @Value("${openai.api.base-url:https://api.openai.com/v1}") String baseUrl,
             @Value("${openai.api.timeout-seconds:90}") int timeoutSeconds,
             @Value("${openai.api.max-output-tokens:12000}") int maxOutputTokens,
+            @Value("${openai.api.portfolio-plan-max-output-tokens:4096}") int portfolioPlanMaxOutputTokens,
             @Value("${openai.api.temperature:0.3}") double temperature,
             RestTemplateBuilder restTemplateBuilder) {
         this.apiKey = apiKey != null ? apiKey.trim() : "";
@@ -78,6 +88,7 @@ public class OpenAiClient {
                 ? baseUrl.replaceAll("/+$", "")
                 : "https://api.openai.com/v1";
         this.maxOutputTokens = maxOutputTokens;
+        this.portfolioPlanMaxOutputTokens = Math.max(512, portfolioPlanMaxOutputTokens);
         this.temperature = temperature;
         Duration timeout = Duration.ofSeconds(Math.max(10, timeoutSeconds));
         this.restTemplate = restTemplateBuilder
@@ -157,6 +168,106 @@ public class OpenAiClient {
         }
     }
 
+    /**
+     * Call 1 for two-phase CV/archive HTML: analyze STEP 2 and return a JSON section plan only.
+     */
+    public PlanResult generatePortfolioPlan(String prompt, String modelOverride) {
+        if (!isConfigured()) {
+            throw new OpenAiNotConfiguredException(
+                    "OPENAI_API_KEY is not set. Configure the openai.api.key property or env var.");
+        }
+        if (prompt == null || prompt.trim().isEmpty()) {
+            throw new OpenAiException("Prompt is empty — cannot call OpenAI.");
+        }
+
+        String model = (modelOverride != null && !modelOverride.trim().isEmpty())
+                ? modelOverride.trim()
+                : defaultModel;
+
+        ObjectNode body = MAPPER.createObjectNode();
+        body.put("model", model);
+        body.put("temperature", temperature);
+        body.put("max_tokens", portfolioPlanMaxOutputTokens);
+        ArrayNode messages = body.putArray("messages");
+        ObjectNode sys = messages.addObject();
+        sys.put("role", "system");
+        sys.put("content", SYSTEM_PORTFOLIO_PLAN_PROMPT);
+        ObjectNode usr = messages.addObject();
+        usr.put("role", "user");
+        usr.put("content", prompt);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(java.util.Collections.singletonList(MediaType.APPLICATION_JSON));
+        headers.set("Authorization", "Bearer " + apiKey);
+
+        String url = baseUrl + "/chat/completions";
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url, HttpMethod.POST, new HttpEntity<>(body.toString(), headers), String.class);
+            return parsePlanResponse(response.getBody(), model);
+        } catch (HttpStatusCodeException e) {
+            int status = e.getRawStatusCode();
+            String snippet = truncate(e.getResponseBodyAsString(StandardCharsets.UTF_8), 600);
+            log.warn("OpenAI HTTP {} for model={} (plan): {}", status, model, snippet);
+            throw new OpenAiException(
+                    "OpenAI returned HTTP " + status + ": " + snippet);
+        } catch (ResourceAccessException e) {
+            if (e.getCause() instanceof SocketTimeoutException) {
+                throw new OpenAiTimeoutException(
+                        "OpenAI request timed out (plan phase). Try raising OPENAI_TIMEOUT.",
+                        e);
+            }
+            throw new OpenAiException("OpenAI network error: " + e.getMessage(), e);
+        } catch (OpenAiException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            throw new OpenAiException("Unexpected OpenAI client error: " + e.getMessage(), e);
+        }
+    }
+
+    private PlanResult parsePlanResponse(String body, String model) {
+        if (body == null || body.isEmpty()) {
+            throw new OpenAiException("OpenAI returned an empty response body.");
+        }
+        try {
+            JsonNode root = MAPPER.readTree(body);
+            JsonNode choices = root.path("choices");
+            if (!choices.isArray() || choices.isEmpty()) {
+                throw new OpenAiException(
+                        "OpenAI response missing choices: " + truncate(body, 400));
+            }
+            String content = choices.get(0).path("message").path("content").asText("");
+            if (content.isEmpty()) {
+                throw new OpenAiException(
+                        "OpenAI response choices[0].message.content was empty.");
+            }
+            String json = stripCodeFence(content).trim();
+            validatePlannerJson(json);
+            int promptTokens = root.path("usage").path("prompt_tokens").asInt(0);
+            int completionTokens = root.path("usage").path("completion_tokens").asInt(0);
+            int totalTokens = root.path("usage").path("total_tokens").asInt(promptTokens + completionTokens);
+            return new PlanResult(json, model, promptTokens, completionTokens, totalTokens);
+        } catch (OpenAiException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new OpenAiException(
+                    "Failed to parse OpenAI response: " + truncate(body, 400), e);
+        }
+    }
+
+    private static void validatePlannerJson(String json) {
+        if (json.isEmpty()) {
+            throw new OpenAiException("Planner returned empty JSON.");
+        }
+        try {
+            MAPPER.readTree(json);
+        } catch (Exception e) {
+            throw new OpenAiException(
+                    "Planner response was not valid JSON: " + truncate(json, 280), e);
+        }
+    }
+
     private Result parseResponse(String body, String model) {
         if (body == null || body.isEmpty()) {
             throw new OpenAiException("OpenAI returned an empty response body.");
@@ -216,6 +327,24 @@ public class OpenAiClient {
 
         public Result(String html, String model, int promptTokens, int completionTokens, int totalTokens) {
             this.html = html;
+            this.model = model;
+            this.promptTokens = promptTokens;
+            this.completionTokens = completionTokens;
+            this.totalTokens = totalTokens;
+        }
+    }
+
+    /** Planner (call 1) result — JSON text plus token usage. */
+    @Getter
+    public static class PlanResult {
+        private final String json;
+        private final String model;
+        private final int promptTokens;
+        private final int completionTokens;
+        private final int totalTokens;
+
+        public PlanResult(String json, String model, int promptTokens, int completionTokens, int totalTokens) {
+            this.json = json;
             this.model = model;
             this.promptTokens = promptTokens;
             this.completionTokens = completionTokens;

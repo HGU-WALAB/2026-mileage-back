@@ -6,6 +6,7 @@ import com.csee.swplus.mileage.portfolio.entity.PortfolioCv;
 import com.csee.swplus.mileage.portfolio.repository.PortfolioCvRepository;
 import com.csee.swplus.mileage.user.entity.Users;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +39,9 @@ public class PortfolioCvService {
     private final PortfolioCvRepository cvRepository;
     private final PortfolioHtmlExportService htmlExportService;
     private final OpenAiClient openAiClient;
+
+    @Value("${openai.api.portfolio-html-two-phase:true}")
+    private boolean portfolioHtmlTwoPhase;
 
     /**
      * Builds the CV prompt and creates a CV record with empty html.
@@ -158,6 +162,10 @@ public class PortfolioCvService {
      * OpenAI fails (timeout, rate limit, etc.) the user's design intent is not lost — the FE can show
      * the prompt and offer a "재시도" button while still showing the previous HTML.
      * <p>
+     * OpenAI pipeline: when {@code openai.api.portfolio-html-two-phase=true} (default), call 1 produces JSON section plan only;
+     * call 2 renders HTML; persisted {@code tokens_used} is the sum of both calls.
+     * When two-phase is disabled, a single HTML call uses STEP 0 silent chain-of-thought prepended to the prompt instead.
+     * <p>
      * If the CV was created before {@code selected_*_ids} columns existed (legacy: {@code null}),
      * regeneration falls back to "no selections" — the FE should re-call {@code POST /build-prompt}.
      *
@@ -187,9 +195,24 @@ public class PortfolioCvService {
         synthetic.setDesign_preferences(newPrefs);
 
         CvPromptMode mode = CvPromptMode.fromRequest(cv.getMode());
-        String prompt = mode == CvPromptMode.CV
-                ? htmlExportService.buildCvPrompt(user, synthetic)
-                : htmlExportService.buildArchivePrompt(user, synthetic);
+        String prompt;
+        int totalTokens;
+
+        if (portfolioHtmlTwoPhase) {
+            String planPrompt = mode == CvPromptMode.CV
+                    ? htmlExportService.buildCvPortfolioPlanPrompt(user, synthetic)
+                    : htmlExportService.buildArchivePortfolioPlanPrompt(user, synthetic);
+            OpenAiClient.PlanResult plan = openAiClient.generatePortfolioPlan(planPrompt, modelOverride);
+            prompt = mode == CvPromptMode.CV
+                    ? htmlExportService.buildCvHtmlGenerationPrompt(user, synthetic, false, plan.getJson())
+                    : htmlExportService.buildArchiveHtmlGenerationPrompt(user, synthetic, false, plan.getJson());
+            totalTokens = plan.getTotalTokens();
+        } else {
+            prompt = mode == CvPromptMode.CV
+                    ? htmlExportService.buildCvHtmlGenerationPrompt(user, synthetic, true, null)
+                    : htmlExportService.buildArchiveHtmlGenerationPrompt(user, synthetic, true, null);
+            totalTokens = 0;
+        }
 
         cv.setPrompt(prompt);
         cv.setDesignPreferences(newPrefs);
@@ -198,7 +221,7 @@ public class PortfolioCvService {
         OpenAiClient.Result result = openAiClient.generateHtml(prompt, modelOverride);
         cv.setHtmlContent(result.getHtml());
         cv.setModelUsed(result.getModel());
-        cv.setTokensUsed(result.getTotalTokens());
+        cv.setTokensUsed(totalTokens + result.getTotalTokens());
         cv.setLastGeneratedAt(LocalDateTime.now());
         cvRepository.save(cv);
 
