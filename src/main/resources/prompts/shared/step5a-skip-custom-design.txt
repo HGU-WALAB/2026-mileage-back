@@ -17,3 +17,9 @@ Write CSS in `<style>` that satisfies STEP 4 (layout / color tokens / density) a
 **Print:** `@media print` must tune **main** column — margins, max-width, font size, `break-inside` / `page-break-inside` on cards — not only hiding nav/sidebar.
 
 Prefer Noto Sans KR for Korean body text.
+
+---
+
+### Paste-ready baseline (adapt class names / tokens). Do not omit `@import`, `:root`, cards, skill bars, or `@media print`.
+
+{{CSS_MINIMUM_SNIPPET}}
