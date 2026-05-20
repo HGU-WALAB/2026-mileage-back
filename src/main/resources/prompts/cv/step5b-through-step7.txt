@@ -29,7 +29,7 @@ Each **featured / project** entry must surface whenever present in STEP 2: 이�
 ---
 
 # STEP 7: QUALITY CHECKLIST (silent, before output)
-- [ ] No fabricated information
+- [ ] When `# PORTFOLIO_PLAN_JSON` is present, section outline / duplicate merges / `%` UI choices follow the plan — still **zero facts** outside STEP 2
 - [ ] `[tech_stack]` percentages shown wherever STEP 2 includes % (RULE 8)
 - [ ] Duplicate same-topic activities merged, not duplicated (RULE 9)
 - [ ] No unsupported hype phrases without repo/activity anchor (RULE 10)

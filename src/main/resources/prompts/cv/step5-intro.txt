@@ -3,6 +3,7 @@
 The generated HTML MUST:
 - be a **single HTML file** with embedded `<style>` (no external `.css` files). Google Fonts `<link>` rows for **Noto Sans KR** (weights 400–700, optionally Inter) in `<head>` are **required** for Korean readability — include `preconnect` + stylesheet `href` exactly like STEP 5-A; do **not** rely on `font-family` alone.
 - include **`@import`** for those Google Fonts inside `<style>` **when** generating custom layouts (STEP 5-B), so fonts still load if `<link>` is stripped — `@import` must appear at the **top** of the stylesheet before other rules.
+- When `[design_preferences]` is **missing or empty**, the prompt embeds the full **STEP 5-A default blue** fragment (verbatim `<style>` + body skeleton). Use it **exactly** — never replace it with improvised CSS/layout.
 - support responsive layout and a complete **`@media print`** block (main column width/padding, readable font size, avoid awkward breaks inside cards — not only hiding chrome).
 - use semantic HTML; avoid unnecessary JS frameworks
 - maintain accessibility and recruiter readability

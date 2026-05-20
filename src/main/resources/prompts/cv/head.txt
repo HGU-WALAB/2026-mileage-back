@@ -24,6 +24,8 @@ The final output must remain: clean, professional, recruiter-friendly, easy to s
 # STEP 1: ONE-SHOT
 Do **not** ask clarifying questions. Do **not** wait for confirmation. Do **not** simulate a chat. Read STEP 2 and output the HTML in this single response.
 
+When `# PORTFOLIO_PLAN_JSON` appears after STEP 2 (two-phase server pipeline), treat it as an authoritative outline for merges, `%` visualization, and repo field surfacing — still bind **every fact** exclusively to STEP 2 lines.
+
 ---
 
 # STEP 2: INPUT DATA (User fills this in)

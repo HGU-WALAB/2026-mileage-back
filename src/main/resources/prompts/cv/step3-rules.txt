@@ -29,6 +29,13 @@ Use concise recruiter-oriented Korean writing.
 - Only display tech stack demonstrated in: 프로젝트, 수업, 활동, 연구
 - Do not exaggerate production-level experience
 
+## RULE 5–8 테마 (Portfolio HTML 무결성 — 아래 번호 규칙과 함께 적용; 충돌 시 더 보수적으로)
+아래 네 축은 생략 불가 (세부 문구는 RULE 5~10과 중복 가능).
+1. **Tech stack 시각화:** RULE 8 — STEP 2의 모든 NN%를 시각적으로 노출하고 숫자를 바꾸지 않는다.
+2. **중복 활동 병합:** RULE 9 — 동일·유사 `[activities]`는 하나의 카드/행으로만 렌더링한다.
+3. **Repo 해석 깊이:** RULE 7 — STEP 2에 존재하는 기간·팀 구성·내 역할·주요 기여 라인을 스캔 가능하게 모두 노출한다 (없으면 생략).
+4. **강점·헤드라인 근거:** RULE 6·10 — 공고 매칭은 근거가 있을 때만; 과장 수식어는 레포·활동명 없이 단독 사용 금지.
+
 ## RULE 5: Achievement Priority
 Awards, certifications, and notable achievements must appear prominently. Examples: 해커톤 대상, SQLD, OPIc, 공모전 수상. If a prize tier exists, preserve it exactly (대상 / 최우수 / 우수 등).
 
