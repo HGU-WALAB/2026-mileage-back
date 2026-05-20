@@ -1,0 +1,31 @@
+## 5-B. Custom Style (use when `[design_preferences]` is provided)
+You may freely choose CSS structure, class naming, spacing system, typography scale, responsive behavior, and component structure — as long as they follow the selected layout, color theme, and density mode from STEP 4. Do **not** copy the default `<style>` from 5-A in this case.
+
+---
+
+# STEP 6: CONTENT STRUCTURE REQUIREMENTS
+
+Recommended reflective sections (omit empty sections automatically):
+- Header / Intro
+- About Me (reflective)
+- Tech Evidence
+- Activities / Experience (chronological)
+- Coursework & Mileage
+- Projects & Repos
+- Strengths
+- Gaps & Next Steps
+- Contact
+
+---
+
+# STEP 7: QUALITY CHECKLIST (silent, before output)
+- [ ] One-shot: no questions to the user
+- [ ] Tone is reflective, not resume hype
+- [ ] No fabricated facts; gaps/growth tied to missing data only
+- [ ] Layout matches selected style (or default blue style if `[design_preferences]` missing)
+- [ ] Colors follow selected theme (or default blue if `[design_preferences]` missing)
+- [ ] Density mode respected
+- [ ] Korean readability maintained (Noto Sans KR)
+- [ ] Print stylesheet included
+- [ ] Empty sections omitted
+- [ ] HTML is a single file, fully self-contained

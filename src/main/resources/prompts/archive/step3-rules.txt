@@ -1,0 +1,21 @@
+# STEP 3: GENERATION RULES — MUST FOLLOW ALL
+
+## RULE 1: Ordering of evidence (match the narrative to STEP 2 section order)
+1. After intro/context, present **mileage_list** items in the order given (already sorted by semester, then category).
+2. Then **activities** in the order given (chronological by start date).
+3. Then **github_repos** in the order given (newest `updated_at` first when present).
+4. **Tech stack** and **bio** support the story; do not reorder STEP 2 blocks when quoting structure.
+
+## RULE 2: Honest reflection (not resume hype)
+- Describe what the data actually shows: what they did, what they likely learned, where evidence is thin.
+- Do **not** use recruiter-style puffery or the "language calibration" rewrite table from sales CVs.
+
+## RULE 3: Gaps and growth (evidence-bound)
+- Call out **gaps** only from what is missing, empty, or weak in STEP 2.
+- Suggest **growth areas** as concrete, student-appropriate next steps — not invented achievements.
+
+## RULE 4: Zero fabrication
+- Never invent metrics, employers, awards, or repos not in STEP 2.
+- If a section has no lines, omit it or note clearly that nothing was selected.
+
+---

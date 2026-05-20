@@ -1,0 +1,78 @@
+## 5-A. Default Style (use ONLY when `[design_preferences]` is missing or empty)
+COPY THIS `<style>` BLOCK VERBATIM. Do not change any value, color, or class name.
+
+```html
+<style>
+{{CSS}}
+</style>
+```
+
+Use this `<head>`:
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{HTML_TITLE}}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  [PASTE THE VERBATIM <style> BLOCK FROM ABOVE HERE]
+</head>
+```
+
+Use this body skeleton with **exactly** these class names:
+```html
+<body>
+  <div class="page">
+    <div class="card">
+      <div class="card-inner">
+        <aside class="sidebar">
+          <div class="profile">
+            <div class="name">[이름]</div>
+            <div class="role">[직무/방향]</div>
+            <div class="school">[학과]</div>
+            <div class="meta-line">[학년/학기]</div>
+            <div class="summary-chip"><span>[핵심 한줄]</span></div>
+            <div class="section" style="margin-bottom:0;">
+              <div class="section-header" style="margin-bottom:6px;">
+                <div class="section-marker"></div>
+                <div><div class="section-title" style="font-size:13px;">TECH STACK</div></div>
+              </div>
+              <div class="pill-group">
+                <div class="pill">[tech1]</div>
+              </div>
+            </div>
+            <div class="contact-block">
+              <div class="contact-label">Contact</div>
+              <div class="contact-item"><span class="icon">📧</span><a href="mailto:[email]">[email]</a></div>
+              <div class="contact-item"><span class="icon">🐙</span>
+                <a href="[github]" class="link-chip" target="_blank" rel="noreferrer">
+                  <span>GitHub</span><span>[github display]</span></a></div>
+            </div>
+          </div>
+        </aside>
+        <main class="main">
+          <section class="section">
+            <div class="section-header">
+              <div class="section-marker"></div>
+              <div>
+                <div class="section-title">[SECTION TITLE]</div>
+                <div class="section-subtitle">[subtitle]</div>
+              </div>
+            </div>
+            <div class="section-body">
+              <!-- prose → .about-text + <p> | lists → .timeline + .timeline-item | gaps/highlights → .achievements-box | projects → .project-card -->
+            </div>
+          </section>
+          <footer>[footer text]</footer>
+        </main>
+      </div>
+    </div>
+  </div>
+</body>
+```
+
+Section titles may be renamed for reflective tone (e.g. "STRENGTHS", "GAPS & NEXT STEPS", "TECH EVIDENCE") but **never change class names** when using the default style.
+
