@@ -1,0 +1,9 @@
+# STEP 5: HTML REQUIREMENTS
+
+The generated HTML MUST:
+- be fully self-contained (internal CSS only)
+- support responsive layout and print CSS
+- render Korean correctly (Noto Sans KR / Inter)
+- use semantic HTML; avoid unnecessary JS frameworks
+- maintain accessibility and recruiter readability
+

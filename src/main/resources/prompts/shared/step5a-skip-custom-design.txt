@@ -1,0 +1,5 @@
+## 5-A. (Omitted — custom design path)
+
+The `[design_preferences]` block in STEP 2 is **non-empty**. **Do not** paste or imitate the default blue `<style>` block from legacy templates.
+
+Write fully self-contained CSS in `<style>` that satisfies STEP 4 (layout / color tokens / density) and STEP 5-B. Prefer Noto Sans KR for Korean body text.

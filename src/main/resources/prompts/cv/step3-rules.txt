@@ -1,0 +1,44 @@
+# STEP 3: GENERATION RULES — MUST FOLLOW ALL
+
+## RULE 1: Strict Priority Order
+Feature content in this order. Skip silently if empty:
+1. GitHub repos + 산학 프로젝트 — Real artifacts, highest credibility
+2. 전공 교과/비교과 — Technical depth
+3. Activities + 대외 활동 — Collaboration, leadership
+4. Bio — Minimal, concise summary only
+
+## RULE 2: Zero Fabrication Policy
+- NEVER invent metrics, links, dates, awards, or project details not explicitly provided
+- Empty fields → omit section entirely (no placeholders)
+- Do not infer technologies not directly mentioned
+- Do not fabricate team size or contribution scope
+
+## RULE 3: Language Calibration
+| Raw Input | Rewrite Style |
+|---|---|
+| "열심히 했다" | "[기술명]을 활용해 [기능] 구현" |
+| "공부했다" | "[기술명] 학습 및 적용" |
+| "팀장을 맡았다" | "팀 리드로서 [담당 역할] 수행" |
+| 모호한 표현 | 구체적인 기술 중심 표현으로 정리 |
+
+Use concise recruiter-oriented Korean writing.
+
+## RULE 4: Honesty & Scope Rules
+- Always distinguish: 개인 프로젝트 / 팀 프로젝트 / 담당 역할
+- Do not claim "Full Stack" unless both frontend and backend evidence exist
+- Only display tech stack demonstrated in: 프로젝트, 수업, 활동, 연구
+- Do not exaggerate production-level experience
+
+## RULE 5: Achievement Priority
+Awards, certifications, and notable achievements must appear prominently. Examples: 해커톤 대상, SQLD, OPIc, 공모전 수상. If a prize tier exists, preserve it exactly (대상 / 최우수 / 우수 등).
+
+## RULE 6: `[job_info]` targeting (Korean hiring context)
+- Treat **공고정보**, **지원 직무**, **추가 요청사항** as *matching hints only* — never invent company facts or JD bullet points not grounded in STEP 2.
+- Hero 한 줄·Featured Projects (최대 3)·요약 칩은 **지원 직무와 근거가 맞는** 프로젝트/활동을 우선 노출한다 (근거 없으면 순서만 조정하지 말고 데이터 순서 존중).
+- 공고·직무 문구의 기술 키워드는 STEP 2 본문에 **실제로 등장할 때만** 반영한다.
+
+## RULE 7: Project cards (`[github_repos]` block)
+- 레포 블록에 `기간`, `팀 구성`, `내 역할`, `주요 기여` 라인이 있으면 HTML에서 불릿·서브섹션 등 **스캔 가능한 형태**로 반드시 노출한다.
+- 해당 줄이 없으면 생략한다 (빈 칸·TBD 금지).
+
+---

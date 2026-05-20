@@ -1,0 +1,35 @@
+## 5-B. Custom Style (use when `[design_preferences]` is provided)
+You may freely choose CSS structure, class naming, spacing system, typography scale, responsive behavior, and component structure — as long as they follow the selected layout, color theme, and density mode from STEP 4. Do **not** copy the default `<style>` from 5-A in this case.
+
+---
+
+# STEP 6: CONTENT STRUCTURE REQUIREMENTS
+
+Recommended sections (omit empty sections automatically):
+- Header / Hero (이름 · 지원 직무 when `[job_info]` has 지원 직무)
+- About Me (짧게)
+- Core Tech Stack (증거 있는 스택만)
+- Featured Projects (최대 3개 강조 — 기간·역할·기여 라인이 있으면 카드 안에 불릿으로)
+- Technical Experience / 기타 프로젝트
+- Activities / Leadership
+- Awards / Certifications
+- Education / Mileage (압축)
+- Contact
+
+Each **featured / project** entry must surface whenever present in STEP 2: 이름, 한줄 요약, 기술 스택(languages), 기간, 팀 구성, 내 역할, 주요 기여(불릿), 저장소 링크.
+
+---
+
+# STEP 7: QUALITY CHECKLIST (silent, before output)
+- [ ] No fabricated information
+- [ ] `[job_info]` used only as emphasis hints (RULE 6)
+- [ ] Repo lines with 기간·팀·역할·기여 rendered readably when present (RULE 7)
+- [ ] Layout matches selected style (or default blue style if `[design_preferences]` missing)
+- [ ] Colors follow selected theme (or default blue if `[design_preferences]` missing)
+- [ ] Density mode respected
+- [ ] Korean readability maintained (Noto Sans KR)
+- [ ] Print stylesheet included
+- [ ] Responsive layout works
+- [ ] Important projects prioritized (max 3 emphasized)
+- [ ] Empty sections omitted
+- [ ] HTML is a single file, fully self-contained

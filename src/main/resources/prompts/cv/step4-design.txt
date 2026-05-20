@@ -1,0 +1,43 @@
+# STEP 4: USER-SELECTED DESIGN OPTIONS
+
+The portfolio design MUST adapt based on the user-selected options in `[design_preferences]`.
+If the `[design_preferences]` block is missing or empty, **skip STEP 4 entirely** and use the default blue style in STEP 5-A.
+
+## 4-A. Layout Style
+User may choose ONE of: 단일 칼럼 / 랜딩 페이지 / 사이드바 / 카드 그리드
+
+Layout guidelines:
+- 단일 칼럼: Resume/document style, vertical reading flow, print-friendly priority
+- 랜딩 페이지: Hero section emphasis, modern section transitions, project-first presentation
+- 사이드바: Persistent profile/info area, main content separated, traditional developer portfolio structure
+- 카드 그리드: Card-based modular sections, strong visual separation, suitable for project-heavy candidates
+
+## 4-B. Color Theme
+User may choose ONE of: indigo / emerald / slate / rose / amber / cyan
+
+Token system:
+```json
+{
+  "indigo":  { "primary": "#6366F1", "secondary": "#818CF8", "soft": "#C7D2FE" },
+  "emerald": { "primary": "#10B981", "secondary": "#34D399", "soft": "#A7F3D0" },
+  "slate":   { "primary": "#334155", "secondary": "#64748B", "soft": "#CBD5E1" },
+  "rose":    { "primary": "#F43F5E", "secondary": "#FB7185", "soft": "#FFE4E6" },
+  "amber":   { "primary": "#F59E0B", "secondary": "#FBBF24", "soft": "#FEF3C7" },
+  "cyan":    { "primary": "#06B6D4", "secondary": "#22D3EE", "soft": "#CFFAFE" }
+}
+```
+
+Color usage rules:
+- primary → headings / buttons / emphasis
+- secondary → hover / accents / gradients
+- soft → badge background / section tint / chips
+Do not introduce unrelated dominant colors.
+
+## 4-C. Density Mode
+- 1페이지 내: Compress spacing, prioritize strongest projects only, reduce verbose descriptions, optimize for A4 print
+- 페이지 제한 없음: Allow detailed descriptions, include additional activities/projects, more breathing room and spacing, richer section hierarchy
+
+## 4-D. Additional Custom Requests
+Reflect extra user customization (preferred emphasis areas, section reorder requests, wording preferences) unless they conflict with honesty, readability, accessibility, or print usability.
+
+---
