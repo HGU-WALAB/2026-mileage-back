@@ -2,4 +2,18 @@
 
 The `[design_preferences]` block in STEP 2 is **non-empty**. **Do not** paste or imitate the default blue `<style>` block from legacy templates.
 
-Write fully self-contained CSS in `<style>` that satisfies STEP 4 (layout / color tokens / density) and STEP 5-B. Prefer Noto Sans KR for Korean body text.
+Write CSS in `<style>` that satisfies STEP 4 (layout / color tokens / density) and STEP 5-B **minimum checklist** below.
+
+**Fonts:** In `<head>`, include Google Fonts `preconnect` + `<link>` for Noto Sans KR (400–700). At the **first line** inside `<style>`, repeat `@import url(...)` for the same families so fonts load even if `<link>` is missing.
+
+**STEP 4-B tokens:** `body`/`html` background = neutral gray only — never theme `soft` as full-page background.
+
+**Typography minimum:** Define explicit `font-size`, `font-weight`, and `line-height` for `body`, `h1`–`h4`, and paragraph-level content (do not rely on browser defaults).
+
+**Sections:** Major content blocks need visible separation — e.g. white (or `--card-bg`) panels with `border-radius`, light border or shadow (not only `margin-bottom`).
+
+**Sidebar layouts:** Structure the sidebar — avatar/profile zone, horizontal separators between skill/contact blocks, badge/chip styling; on wide viewports `position: sticky` + internal scroll is acceptable.
+
+**Print:** `@media print` must tune **main** column — margins, max-width, font size, `break-inside` / `page-break-inside` on cards — not only hiding nav/sidebar.
+
+Prefer Noto Sans KR for Korean body text.

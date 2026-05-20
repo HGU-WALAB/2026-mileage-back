@@ -27,7 +27,7 @@ public class PortfolioPromptLoader {
         return cache.computeIfAbsent(path, this::readClasspathUtf8);
     }
 
-    /** Minified default blue portfolio stylesheet (same as server-side HTML export). */
+    /** Default blue portfolio stylesheet (same as server-side HTML export; multiline + @import fonts). */
     public String defaultBlueCss() {
         return load("shared/default-blue-style.css").trim();
     }

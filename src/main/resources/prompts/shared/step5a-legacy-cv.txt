@@ -7,6 +7,8 @@ COPY THIS `<style>` BLOCK VERBATIM. Do not change any value, color, or class nam
 </style>
 ```
 
+Note: The substituted stylesheet begins with `@import` for Noto Sans KR / Inter so Korean renders even if `<link>` tags are omitted — **still paste** the `<head>` `<link>` rows below for faster loads.
+
 Use this `<head>`:
 ```html
 <!DOCTYPE html>

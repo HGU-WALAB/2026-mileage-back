@@ -29,7 +29,7 @@ Token system:
 Color usage rules:
 - primary → headings / emphasis
 - secondary → hover / accents / gradients
-- soft → badge background / section tint / chips
+- soft → badge background / section tint / chips **only** (small surfaces). Never use `soft` as `html` or `body` background — full-page backgrounds must stay **neutral** (e.g. `#f8fafc`, `#f9fafb`, or equivalent gray-50/slate-50). Using theme `soft` as the page wash lowers contrast and increases eye strain.
 Do not introduce unrelated dominant colors.
 
 ## 4-C. Density Mode

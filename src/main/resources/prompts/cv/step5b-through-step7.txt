@@ -1,6 +1,14 @@
 ## 5-B. Custom Style (use when `[design_preferences]` is provided)
 You may freely choose CSS structure, class naming, spacing system, typography scale, responsive behavior, and component structure — as long as they follow the selected layout, color theme, and density mode from STEP 4. Do **not** copy the default `<style>` from 5-A in this case.
 
+**Minimum CSS (STEP 4-B + readability):**
+- **Fonts:** `<head>` must include Google Fonts `preconnect` + `<link>` for Noto Sans KR (400–700). First line inside `<style>`: `@import` the same Google Fonts URL so glyphs load even without `<link>`.
+- **Page background:** `html`/`body` use a **neutral** gray (`#f8fafc`–`#f9fafb` family). Never apply theme token **`soft`** as the full-page background.
+- **Typography:** Explicit `font-size`, `font-weight`, `line-height` for `body`, headings (`h1`–`h4` minimum), and body copy — no reliance on browser defaults alone.
+- **Sections:** Main content blocks use card-like surfaces (background contrast vs page, `border-radius`, border or shadow) — not spacing-only separation.
+- **Sidebar layouts:** Avatar/profile zone, separators between sidebar regions, chips/badges; optional `position: sticky` + bounded height/`overflow-y` on wide screens.
+- **Print:** `@media print` adjusts main column margins, type size, and `break-inside`/`page-break-inside` on cards/tables; if sidebar is hidden, repeat critical contact lines in the printable main flow.
+
 ---
 
 # STEP 6: CONTENT STRUCTURE REQUIREMENTS
@@ -30,9 +38,13 @@ Each **featured / project** entry must surface whenever present in STEP 2: 이�
 - [ ] Layout matches selected style (or default blue style if `[design_preferences]` missing)
 - [ ] Colors follow selected theme (or default blue if `[design_preferences]` missing)
 - [ ] Density mode respected
-- [ ] Korean readability maintained (Noto Sans KR)
-- [ ] Print stylesheet included
+- [ ] Korean readability: Google Fonts `<link>` **and** `@import` inside `<style>` for Noto Sans KR (custom path); default blue path keeps verbatim `<head>` links
+- [ ] Page background neutral; theme **`soft`** never used as full-page wash (STEP 4-B)
+- [ ] Typography scale defined for `body`, `h1`–`h4`, and paragraphs (sizes/weights/line-height)
+- [ ] Main sections visually separated (card/panel — not margin-only)
+- [ ] Sidebar layouts (if used): structured zones + separators; optional sticky sidebar on wide viewports
+- [ ] `@media print` tunes main column (margins, type, break rules) — not only hiding chrome
 - [ ] Responsive layout works
 - [ ] Important projects prioritized (max 3 emphasized)
 - [ ] Empty sections omitted
-- [ ] HTML is a single file, fully self-contained
+- [ ] Single HTML file; embedded CSS; `fonts.googleapis.com` links allowed
