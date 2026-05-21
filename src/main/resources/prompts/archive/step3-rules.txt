@@ -41,4 +41,13 @@
 ## RULE 8: Strength citations (explicit)
 - Restates RULE 2: each reflective strength bullet cites ≥1 concrete STEP 2 title from `[activities]` or `[github_repos]` by name in the same bullet or sentence.
 
+## RULE 9: 링크 처리
+- `[github_repos]`에 `· URL:` 이 있으면 제목을 `<a href="[url]" target="_blank" rel="noopener noreferrer">[제목] ↗</a>` 로 렌더링.
+- `[contact]` GitHub → `<a href>` (새 탭), Email → `<a href="mailto:">`.
+- `[activities]`에 `· URL:` 이 있으면 동일 `target`/`rel`로 링크화.
+
+## RULE 10: 설명 자동 개선 (activity / repo)
+- `· 설명:` + `· tags:`(또는 `· 기술:`)만 참고해 **1–2줄**로: "[기술명]을 활용해 [기능/역할] 구현" 형식.
+- 원본·tags에 없는 기술·사실·수치는 추가 금지. 톤은 성찰형이되 과장 없이.
+
 ---

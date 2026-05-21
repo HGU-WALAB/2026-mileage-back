@@ -20,5 +20,7 @@ Required top-level keys (use empty arrays/objects when unused):
 - **achievements_section_required** (boolean)
 - **density_mode** (string): `one_page_a4` | `unlimited`
 - **secondary_items_to_hide** (array): project/activity titles to mark `.secondary-*` when density is one page
+- **link_targets** (array): `{ "title", "url", "kind": "repo|activity|github_profile|email" }` from STEP 2 only
+- **description_rewrite** (array): `{ "source_title", "rewritten_ko", "tech_cited": [] }` per RULE 10 — tags/original only
 
 No prose outside JSON (except optional single ```json fence pair).

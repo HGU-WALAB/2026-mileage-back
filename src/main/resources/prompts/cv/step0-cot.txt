@@ -10,6 +10,8 @@ Before writing HTML, mentally complete these checks (do not print this block):
 6. **Layout:** If `레이아웃: 랜딩 페이지`, plan `.hero` + `.site-nav` + `.section-band` + `.projects-featured` grid — not only stacked `.section-card`.
 7. **Awards:** Scan mileage/activities for 해커톤·대상·SQLD·OPIc → `.achievements-highlight` near top.
 8. **Contributions:** Vague "이것저것" bullets → RULE 3-B placeholder, not verbatim copy.
+9. **Links:** Repo `· URL:` → titled `<a …> ↗</a>`; contact mailto/http (RULE 9).
+10. **Descriptions:** Rewrite activity/repo `· 설명:` using tags only — RULE 10 format, no new facts.
 
 Then proceed to STEP 1–7 as usual. Output remains HTML only.
 

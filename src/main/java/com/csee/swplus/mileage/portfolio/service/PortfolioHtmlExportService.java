@@ -665,7 +665,7 @@ public class PortfolioHtmlExportService {
             sb.append("  · ").append(meta).append("\n");
         }
         if (r.getHtml_url() != null && !r.getHtml_url().trim().isEmpty()) {
-            sb.append(r.getHtml_url().trim()).append("\n");
+            sb.append("  · URL: ").append(r.getHtml_url().trim()).append("\n");
         }
     }
 

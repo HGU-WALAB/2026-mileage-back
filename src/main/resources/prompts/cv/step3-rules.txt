@@ -33,11 +33,13 @@ When a repo/activity **주요 기여** bullet is only vague filler (e.g. "뭐 �
 - Do not exaggerate production-level experience
 
 ## RULE 5–8 테마 (Portfolio HTML 무결성 — 아래 번호 규칙과 함께 적용; 충돌 시 더 보수적으로)
-아래 네 축은 생략 불가 (세부 문구는 RULE 5~10과 중복 가능).
+아래 축은 생략 불가 (세부 문구는 RULE 5~12와 중복 가능).
 1. **Tech stack 시각화:** RULE 8 — STEP 2의 모든 NN%를 시각적으로 노출하고 숫자를 바꾸지 않는다.
-2. **중복 활동 병합:** RULE 9 — 동일·유사 `[activities]`는 하나의 카드/행으로만 렌더링한다.
-3. **Repo 해석 깊이:** RULE 7 — STEP 2에 존재하는 기간·팀 구성·내 역할·주요 기여 라인을 스캔 가능하게 모두 노출한다 (없으면 생략).
-4. **강점·헤드라인 근거:** RULE 6·10 — 공고 매칭은 근거가 있을 때만; 과장 수식어는 레포·활동명 없이 단독 사용 금지.
+2. **링크:** RULE 9 — repo/연락처 URL을 클릭 가능한 `<a>`로 렌더링.
+3. **설명 개선:** RULE 10 — tags·원본 설명만으로 1–2줄 기술 중심 재작성.
+4. **중복 활동 병합:** RULE 11 — 동일·유사 `[activities]`는 하나의 카드/행으로만 렌더링한다.
+5. **Repo 해석 깊이:** RULE 7 — STEP 2에 존재하는 기간·팀 구성·내 역할·주요 기여 라인을 스캔 가능하게 모두 노출한다 (없으면 생략).
+6. **강점·헤드라인 근거:** RULE 6·12 — 공고 매칭은 근거가 있을 때만; 과장 수식어는 레포·활동명 없이 단독 사용 금지.
 
 ## RULE 5: Achievement Priority (dedicated section — do not bury)
 Scan **all** of `[mileage_list]`, `[activities]`, and `[github_repos]` for awards/certs, including:
@@ -60,10 +62,32 @@ Render a visible **ACHIEVEMENTS / 수상·자격** block (use `.achievements-hig
 - STEP 2의 `- 기술명 (영역) NN%` 형태 줄에 **NN%** 가 있으면, HTML의 Core Tech Stack 구역에서 **반드시 숫자를 노출**한다 (막대·원형 차트·표의 %열·텍스트 `Java 70%` 등 허용).
 - STEP 2에 적힌 퍼센트를 임의로 바꾸거나 숨기지 않는다.
 
-## RULE 9: 활동 중복 병합 (`[activities]`)
+## RULE 9: 링크 처리
+- **`[github_repos]`:** 각 항목에 `· URL:` (또는 동등한 URL 줄)이 있으면, 프로젝트/레포 **제목**을 반드시 아래 형태의 링크로 렌더링한다 (URL이 없으면 링크 없이 텍스트만):
+  ```html
+  <a href="[url]" target="_blank" rel="noopener noreferrer">[제목] ↗</a>
+  ```
+- **`[contact]`:** STEP 2의 GitHub URL → `<a href="[url]" target="_blank" rel="noopener noreferrer">GitHub ↗</a>` (또는 표시용 짧은 텍스트 + 동일 `href`).
+- **`[contact]`:** Email → `<a href="mailto:[email]">[email]</a>`.
+- **`[activities]`:** `· URL:` 이 있으면 활동 제목 또는 별도 "링크 ↗" 칩에 동일 `target`/`rel` 적용.
+- URL·이메일은 STEP 2에 있는 값만 사용 (조작·단축 금지).
+
+## RULE 10: 설명 자동 개선 (activity / repo)
+`[activities]`·`[github_repos]`의 **설명**(`· 설명:`)과 **tags**(`· tags:` 또는 `· 기술:` 언어 목록)를 함께 읽고, 아래 형식으로 **1–2줄** 재작성한다:
+
+> **[기술명]을 활용해 [기능/역할] 구현** (또는 "…학습 및 적용", "…담당" — 원문 톤에 맞게)
+
+Constraints:
+- **기술명**은 tags·`· 기술:`·원본 설명에 **실제로 등장한** 스택/도구만 사용한다.
+- **기능/역할/결과**는 원본 설명·`내 역할`·`주요 기여`·`성과`에 있는 범위만 반영한다 — **원본에 없는 사실·수치·기술·성과는 절대 추가하지 않는다.**
+- 원문이 이미 구체적이면 과도한 의역 없이 1줄로만 다듬어도 된다.
+- RULE 3-B가 적용되는 **주요 기여** 불릿은 이 규칙으로 대체하지 않는다 (기여 줄은 3-B 우선).
+- About / `[bio]` / `[mileage_list]`에는 적용하지 않는다.
+
+## RULE 11: 활동 중복 병합 (`[activities]`)
 - 동일·유사 프로젝트가 제목이 같거나(공백·대소문자 무시) 핵심 키워드가 겹치면 **하나의 카드/타임라인 행으로 병합**하고 기간만 정리한다. 같은 내용 카드를 두 번 렌더링하지 않는다.
 
-## RULE 10: 근거 없는 수식어 금지 (recruiter 모드)
+## RULE 12: 근거 없는 수식어 금지 (recruiter 모드)
 - "깊은 이해", "풍부한 경험", "탄탄한 역량" 등 **구체 레포·활동·수상명 없이** 단독으로 쓰지 않는다. 한 줄 요약·About도 가능하면 레포/활동 이름과 연결한다.
 
 ---

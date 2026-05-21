@@ -13,6 +13,8 @@ Output **only** a single JSON object that:
 6. Reads `[design_preferences]` **레이아웃** and sets `layout_implementation` to one of: `typographic_editorial` | `immersive_web` | `dark_dev_sidebar` | `bento_dashboard` (landing ≠ single column).
 7. Lists `awards_and_certs_found` by scanning mileage/activities for 수상·SQLD·OPIc·해커톤·대상 etc.; `achievements_section_required: true` when any found.
 8. Flags repo contribution bullets that are vague-only → `use_contribution_placeholder: true` per RULE 3-B.
+9. Lists repos/activities with `URL` for RULE 9 link rendering; contact block for mailto/GitHub anchors.
+10. Plans `description_rewrite` per activity/repo: tech names from tags/`· 기술:` only, 1–2 lines, RULE 10 format — no invented facts.
 
 Forbidden: inventing employers, awards, percentages, dates, stacks, or links not present in STEP 2.
 
