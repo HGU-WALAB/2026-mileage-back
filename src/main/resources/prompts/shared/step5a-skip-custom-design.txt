@@ -4,7 +4,11 @@ The `[design_preferences]` block in STEP 2 is **non-empty**. **Do not** paste or
 
 Write CSS in `<style>` that satisfies STEP 4 (layout / color tokens / density) and STEP 5-B **minimum checklist** below.
 
-**Fonts:** In `<head>`, include Google Fonts `preconnect` + `<link>` for Noto Sans KR (400–700). At the **first line** inside `<style>`, repeat `@import url(...)` for the same families so fonts load even if `<link>` is missing.
+**Fonts (mandatory — both):** Your HTML `<head>` MUST contain these three tags **before** `<style>` (copy verbatim):
+
+{{MANDATORY_HEAD_FONT_LINKS}}
+
+Also put `@import` for the same families as the **first line** inside `<style>`. Output is **invalid** if `<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR` is missing from `<head>`.
 
 **STEP 4-B tokens:** `body`/`html` background = neutral gray only — never theme `soft` as full-page background.
 
@@ -23,3 +27,11 @@ Prefer Noto Sans KR for Korean body text.
 ### Paste-ready baseline (adapt class names / tokens). Do not omit `@import`, `:root`, cards, skill bars, or `@media print`.
 
 {{CSS_MINIMUM_SNIPPET}}
+
+### Layout CSS for STEP 2 `레이아웃` — merge into your stylesheet and use the HTML skeleton classes (required; do not ignore):
+
+{{CSS_LAYOUT_SNIPPET}}
+
+### Density CSS when STEP 2 `밀도` is **1페이지 내** (merge + add `density-one-page` on `<body>`; mark non-featured items with `.secondary-activity` / `.secondary-project`):
+
+{{CSS_DENSITY_SNIPPET}}

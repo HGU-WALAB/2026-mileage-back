@@ -41,6 +41,27 @@ p  { margin: 0 0 0.65em; }
   margin-bottom: 1rem;
 }
 
+.achievements-highlight {
+  background: var(--primary-soft);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  padding: 1rem 1.15rem;
+  margin: 1rem 0 1.25rem;
+}
+.achievements-highlight h2 {
+  color: var(--primary);
+  font-size: 1rem;
+  margin: 0 0 0.5rem;
+}
+.achievements-highlight ul { margin: 0; padding-left: 1.2rem; }
+.achievements-highlight li { font-weight: 600; margin-bottom: 0.35rem; }
+
+.contribution-missing {
+  font-style: italic;
+  color: var(--muted);
+  font-size: 0.9em;
+}
+
 /* Tech stack % — horizontal bar pattern */
 .skill-row { margin-bottom: 0.55rem; }
 .skill-meta {

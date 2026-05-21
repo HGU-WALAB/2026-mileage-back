@@ -55,7 +55,9 @@ public class OpenAiClient {
             "You are an HTML generator. Return EXACTLY ONE complete HTML document and nothing else. "
                     + "Do NOT wrap the output in markdown code fences. Do NOT include any prose, explanations, "
                     + "or chat preamble before or after the HTML. The first character of your response MUST be "
-                    + "'<' and the last must be '>'.";
+                    + "'<' and the last must be '>'. "
+                    + "Inside <head>, BEFORE <style>, include Google Fonts preconnect and stylesheet <link> tags "
+                    + "for Noto Sans KR (the user prompt shows the exact lines to copy).";
 
     /**
      * Call 1 — JSON-only section planner. Output must be a single JSON object (optionally wrapped in {@code ```json}).
