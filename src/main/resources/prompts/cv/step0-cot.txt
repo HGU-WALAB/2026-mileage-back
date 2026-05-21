@@ -7,6 +7,9 @@ Before writing HTML, mentally complete these checks (do not print this block):
 3. **Tech stack %:** Every `- Skill (domain) NN%` line must appear in UI with visible **NN%** (bar/pill/table).
 4. **Repos:** Each repo block — list which sub-lines exist (기간/팀/내 역할/주요 기여) and surface all that exist.
 5. **Claims:** Every strength/hero line must cite a concrete STEP 2 repo or activity name.
+6. **Layout:** If `레이아웃: 랜딩 페이지`, plan `.hero` + `.site-nav` + `.section-band` + `.projects-featured` grid — not only stacked `.section-card`.
+7. **Awards:** Scan mileage/activities for 해커톤·대상·SQLD·OPIc → `.achievements-highlight` near top.
+8. **Contributions:** Vague "이것저것" bullets → RULE 3-B placeholder, not verbatim copy.
 
 Then proceed to STEP 1–7 as usual. Output remains HTML only.
 

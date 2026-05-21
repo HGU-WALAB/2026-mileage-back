@@ -8,6 +8,10 @@ You may freely choose CSS structure, class naming, spacing system, typography sc
 - **Sections:** Main content blocks use card-like surfaces (background contrast vs page, `border-radius`, border or shadow) — not spacing-only separation.
 - **Sidebar layouts:** Avatar/profile zone, separators between sidebar regions, chips/badges; optional `position: sticky` + bounded height/`overflow-y` on wide screens.
 - **Print:** `@media print` adjusts main column margins, type size, and `break-inside`/`page-break-inside` on cards/tables; if sidebar is hidden, repeat critical contact lines in the printable main flow.
+- **Layout snippet:** Merge STEP 5 `CSS_LAYOUT_SNIPPET` and use its class names (`.hero`, `.site-nav`, `.layout-sidebar`, `.cards-grid`, etc.) — **랜딩 페이지** must not look identical to **단일 칼럼**.
+- **`<head>` fonts:** Copy verbatim `MANDATORY_HEAD_FONT_LINKS` before `<style>`; `@import` alone is insufficient.
+- **Achievements:** `.achievements-highlight` section when STEP 2 contains awards/certs (RULE 5).
+- **Contributions:** Apply RULE 3-B for vague 주요 기여 bullets.
 
 ---
 
@@ -35,7 +39,11 @@ Each **featured / project** entry must surface whenever present in STEP 2: 이�
 - [ ] No unsupported hype phrases without repo/activity anchor (RULE 10)
 - [ ] `[job_info]` used only as emphasis hints (RULE 6)
 - [ ] Repo lines with 기간·팀·역할·기여 rendered readably when present (RULE 7)
-- [ ] Layout matches selected style (or default blue style if `[design_preferences]` missing)
+- [ ] Layout matches STEP 2 `레이아웃` + embedded layout CSS snippet (landing = hero+nav+grid; sidebar = two columns; not generic stack only)
+- [ ] `<head>` contains Google Fonts `<link href="...Noto+Sans+KR...">` **and** `@import` in `<style>`
+- [ ] Awards/certs from STEP 2 in `.achievements-highlight` when present (RULE 5)
+- [ ] Vague 주요 기여 → *(기여 내용 미입력)* per RULE 3-B, not copied filler text
+- [ ] If 밀도 is 1페이지 내: `body.density-one-page`, `.secondary-*` hidden, print ≤ ~1 A4 page intent
 - [ ] Colors follow selected theme (or default blue if `[design_preferences]` missing)
 - [ ] Density mode respected
 - [ ] Korean readability: Google Fonts `<link>` **and** `@import` inside `<style>` for Noto Sans KR (custom path); default blue path keeps verbatim `<head>` links

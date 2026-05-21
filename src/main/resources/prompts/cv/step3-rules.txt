@@ -23,6 +23,9 @@ Feature content in this order. Skip silently if empty:
 
 Use concise recruiter-oriented Korean writing.
 
+### RULE 3-B: Unrewriteable contribution lines
+When a repo/activity **주요 기여** bullet is only vague filler (e.g. "뭐 했습니다", "이것저것", "여러 가지 했습니다", "등등", "기타") and cannot be turned into a concrete tech/action phrase **without inventing facts**, do **not** copy that bullet verbatim. Instead show a single line: *(기여 내용 미입력)* in `<em class="contribution-missing">` (or equivalent). If **all** contribution bullets for a project are empty/vague, one *(기여 내용 미입력)* line under that project is enough.
+
 ## RULE 4: Honesty & Scope Rules
 - Always distinguish: 개인 프로젝트 / 팀 프로젝트 / 담당 역할
 - Do not claim "Full Stack" unless both frontend and backend evidence exist
@@ -36,8 +39,13 @@ Use concise recruiter-oriented Korean writing.
 3. **Repo 해석 깊이:** RULE 7 — STEP 2에 존재하는 기간·팀 구성·내 역할·주요 기여 라인을 스캔 가능하게 모두 노출한다 (없으면 생략).
 4. **강점·헤드라인 근거:** RULE 6·10 — 공고 매칭은 근거가 있을 때만; 과장 수식어는 레포·활동명 없이 단독 사용 금지.
 
-## RULE 5: Achievement Priority
-Awards, certifications, and notable achievements must appear prominently. Examples: 해커톤 대상, SQLD, OPIc, 공모전 수상. If a prize tier exists, preserve it exactly (대상 / 최우수 / 우수 등).
+## RULE 5: Achievement Priority (dedicated section — do not bury)
+Scan **all** of `[mileage_list]`, `[activities]`, and `[github_repos]` for awards/certs, including:
+- 수상 tiers: **대상**, **최우수**, **우수**, **입상**, **해커톤** + prize words
+- Certifications: **SQLD**, **정보처리기사**, **AWS**, **OPIc**, **TOEIC**, **JLPT**, etc. when spelled in STEP 2
+- Club/competition lines (e.g. **PARD**, **동아리** + **해커톤**)
+
+Render a visible **ACHIEVEMENTS / 수상·자격** block (use `.achievements-highlight`) **near the top** (after hero/header, before long project lists). List **every** matching line from STEP 2 with exact wording — e.g. "PARD 동아리 해커톤 대상", "SQLD", "OPIc AL". Never omit a high-signal award that appears in STEP 2. If none exist, omit the section entirely.
 
 ## RULE 6: `[job_info]` targeting (Korean hiring context)
 - Treat **공고정보**, **지원 직무**, **추가 요청사항** as *matching hints only* — never invent company facts or JD bullet points not grounded in STEP 2.

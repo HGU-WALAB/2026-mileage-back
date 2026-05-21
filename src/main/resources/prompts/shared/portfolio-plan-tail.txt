@@ -15,5 +15,10 @@ Required top-level keys (use empty arrays/objects when unused):
 - **strength_claims_with_evidence** (array): each item has **claim_ko** and **must_cite** (array of `"repo: …"` / `"activity: …"` references that exist in STEP 2).
 - **sections** (array): objects with **id**, **title_ko**, **evidence_refs**, **omit_if_empty**.
 - **fabrication_risks** (array of strings): where inference must be avoided.
+- **layout_implementation** (string): `landing_hero_nav_grid` | `sidebar_two_column` | `card_grid` | `single_column_doc`
+- **awards_and_certs_found** (array of strings): verbatim lines from STEP 2
+- **achievements_section_required** (boolean)
+- **density_mode** (string): `one_page_a4` | `unlimited`
+- **secondary_items_to_hide** (array): project/activity titles to mark `.secondary-*` when density is one page
 
 No prose outside JSON (except optional single ```json fence pair).

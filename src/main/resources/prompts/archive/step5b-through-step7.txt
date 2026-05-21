@@ -34,7 +34,9 @@ Recommended reflective sections (omit empty sections automatically):
 - [ ] `[tech_stack]` percentages rendered wherever STEP 2 includes %
 - [ ] No duplicate activity cards for the same project/topic (RULE 5)
 - [ ] No fabricated facts; gaps/growth tied to missing data only
-- [ ] Layout matches selected style (or default blue style if `[design_preferences]` missing)
+- [ ] Layout matches STEP 2 `레이아웃` + layout CSS snippet (not generic single stack when user chose landing/sidebar/grid)
+- [ ] `<head>` has Noto Sans KR `<link>` + `@import`
+- [ ] If 밀도 is 1페이지 내: `density-one-page` + hide `.secondary-*`
 - [ ] Colors follow selected theme (or default blue if `[design_preferences]` missing)
 - [ ] Density mode respected
 - [ ] Korean readability: Google Fonts `<link>` **and** `@import` inside `<style>` for Noto Sans KR (custom path); default blue path keeps verbatim `<head>` links
