@@ -8,7 +8,7 @@ You may freely choose CSS structure, class naming, spacing system, typography sc
 - **Sections:** Main content blocks use card-like surfaces (background contrast vs page, `border-radius`, border or shadow) — not spacing-only separation.
 - **Sidebar layouts:** Avatar/profile zone, separators between sidebar regions, chips/badges; optional `position: sticky` + bounded height/`overflow-y` on wide screens.
 - **Print:** `@media print` adjusts main column margins, type size, and `break-inside`/`page-break-inside` on cards/tables; if sidebar is hidden, repeat critical contact lines in the printable main flow.
-- **Layout snippet:** Merge STEP 5 `CSS_LAYOUT_SNIPPET` and use its class names (`.hero`, `.site-nav`, `.layout-sidebar`, `.cards-grid`, etc.) — **랜딩 페이지** must not look identical to **단일 칼럼**.
+- **Layout snippet:** Merge `CSS_THEME_TOKENS` + `CSS_LAYOUT_SNIPPET`; use wrapper `.layout-editorial` | `.layout-immersive` | `.layout-darkdev` | `.layout-bento` per STEP 2 레이아웃 — **랜딩** must use `.immersive-hero` + `.immersive-nav`, not `.editorial-hero` only.
 - **`<head>` fonts:** Copy verbatim `MANDATORY_HEAD_FONT_LINKS` before `<style>`; `@import` alone is insufficient.
 - **Achievements:** `.achievements-highlight` section when STEP 2 contains awards/certs (RULE 5).
 - **Contributions:** Apply RULE 3-B for vague 주요 기여 bullets.

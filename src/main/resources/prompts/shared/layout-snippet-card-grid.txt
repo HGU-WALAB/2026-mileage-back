@@ -1,37 +1,208 @@
-/* === LAYOUT: 카드 그리드 (MANDATORY when STEP 2 says 레이아웃: 카드 그리드) === */
+/* ═══ LAYOUT: 카드 그리드 — "Bento Dashboard" (recommended theme: amber) ═══
+   Asymmetric bento grid, dark + light cards, award card emphasis. Most visually distinctive.
+   Wrapper: .layout-bento */
 
-.page-grid {
-  max-width: 1040px;
-  margin: 0 auto;
-  padding: 1.25rem 1rem 2rem;
+.layout-bento {
+  background: #fafaf9;
+  padding: 26px;
+  font-family: var(--font-ui);
+  min-height: 100%;
 }
-.page-grid .grid-header {
-  margin-bottom: 1.25rem;
-}
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
-}
-.cards-grid .section-card,
-.cards-grid .grid-module {
-  height: 100%;
+
+.bento-header {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
 }
-.cards-grid .grid-module h2 {
-  font-size: 0.95rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--primary);
-  margin-bottom: 0.65rem;
+.bento-header h1 {
+  font-size: 30px;
+  font-weight: 900;
+  color: #1c1917;
+  letter-spacing: -0.03em;
+  margin: 0 0 2px;
+}
+.bento-header .header-role {
+  font-size: 14px;
+  color: var(--secondary);
+  font-weight: 700;
+}
+.bento-header-certs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
-/* HTML skeleton:
-<div class="page-grid">
-  <header class="grid-header">...</header>
-  <div class="cards-grid">
-    <article class="grid-module section-card">...</article>
+.bento-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 12px;
+  grid-auto-rows: minmax(0, auto);
+}
+@media (max-width: 900px) {
+  .bento-grid {
+    grid-template-columns: 1fr;
+  }
+  .bento-span-row,
+  .bento-span-cols { grid-column: 1 / -1 !important; grid-row: auto !important; }
+}
+
+.bento-card {
+  border-radius: 16px;
+  padding: 22px;
+  background: #fff;
+  border: 1px solid #e7e5e4;
+}
+.bento-card--dark {
+  background: #1c1917;
+  border: 1px solid #292524;
+  color: #d6d3d1;
+}
+.bento-card-label {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #a8a29e;
+  margin-bottom: 14px;
+}
+.bento-card--dark .bento-card-label { color: #57534e; }
+
+.bento-span-rows {
+  grid-row: span 2;
+}
+.bento-span-cols {
+  grid-column: span 2;
+}
+.bento-span-full {
+  grid-column: 1 / -1;
+}
+
+/* Award highlight cell */
+.bento-award-card {
+  border-radius: 16px;
+  padding: 22px;
+  background: linear-gradient(140deg, #92400e, var(--primary), var(--secondary));
+  color: #fff;
+  height: 100%;
+  min-height: 140px;
+}
+.bento-award-card .award-emoji { font-size: 32px; margin-bottom: 10px; }
+.bento-award-card .award-title {
+  font-weight: 900;
+  font-size: 16px;
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+.bento-award-card .award-tier {
+  color: #fde68a;
+  font-weight: 800;
+  font-size: 14px;
+}
+.bento-award-card .award-period {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 11.5px;
+  margin-top: 6px;
+}
+
+.bento-bio-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.bento-btn-primary {
+  padding: 8px 18px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.bento-btn-ghost {
+  padding: 8px 18px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #a8a29e;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border: 1px solid #292524;
+  text-decoration: none;
+}
+
+.bento-skills-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px 24px;
+}
+
+.bento-project-card .bento-accent-bar {
+  width: 24px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 2px;
+  margin-bottom: 10px;
+}
+.bento-project-card.is-featured {
+  border: 1.5px solid var(--secondary);
+}
+.bento-project-card h3 {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #1c1917;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+.bento-project-card .project-period {
+  font-size: 11px;
+  color: #a8a29e;
+  float: right;
+}
+
+.bento-activities-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+@media (max-width: 768px) {
+  .bento-activities-mini-grid { grid-template-columns: 1fr 1fr; }
+}
+.bento-activity-mini {
+  padding: 12px 14px;
+  background: #fafaf9;
+  border-radius: 10px;
+  border: 1px solid #e7e5e4;
+}
+.bento-activity-mini .mini-title {
+  font-weight: 700;
+  font-size: 13px;
+  color: #1c1917;
+  margin-bottom: 3px;
+}
+.bento-activity-mini .mini-period {
+  font-size: 11px;
+  color: #a8a29e;
+  margin-bottom: 5px;
+}
+.bento-activity-mini .mini-desc {
+  font-size: 12px;
+  color: #78716c;
+  line-height: 1.5;
+}
+
+/*
+<body class="layout-bento">
+  <header class="bento-header"> name + role + cert tags </header>
+  <div class="bento-grid">
+    <div class="bento-card bento-card--dark bento-span-rows"> bio + CTAs </div>
+    <div class="bento-award-card"> top award </div>
+    <div class="bento-card bento-card--dark"> contact </div>
+    <div class="bento-card bento-span-cols"> skills 2-col </div>
+    <article class="bento-card bento-project-card"> ×3 projects </article>
+    <div class="bento-card bento-span-full"> activities mini grid </div>
   </div>
-</div>
+</body>
 */

@@ -2,15 +2,16 @@
 
 If the `[design_preferences]` block is missing or empty, **skip STEP 4 entirely** and use the default blue style in STEP 5-A.
 
-## 4-A. Layout Style
-User may choose ONE of: 단일 칼럼 / 랜딩 페이지 / 사이드바 / 카드 그리드
+## 4-A. Layout Style (archetypes — same CSS snippets as CV)
 
-STEP 5 embeds **layout-specific CSS + skeleton** — implement it; do not default to one vertical `.section-card` stack for every choice.
+| 레이아웃 | Archetype | Wrapper class |
+|----------|-----------|---------------|
+| 단일 칼럼 | Typographic Editorial | `.layout-editorial` |
+| 랜딩 페이지 | Immersive Web | `.layout-immersive` |
+| 사이드바 | Dark Dev Portfolio | `.layout-darkdev` |
+| 카드 그리드 | Bento Dashboard | `.layout-bento` |
 
-- **단일 칼럼:** `.page-single` + `.doc-header` — no hero gradient / sticky nav / project grid.
-- **랜딩 페이지:** `.hero` (gradient) + `.site-nav` anchors + `.section-band` alternating backgrounds + `.projects-featured` grid when repos exist.
-- **사이드바:** `.layout-sidebar` with sticky `.sidebar` + `.main`.
-- **카드 그리드:** `.cards-grid` multi-column modules.
+Use embedded snippet classes exactly; do not collapse all layouts into one column of `.section-card`.
 
 ## 4-B. Color Theme
 User may choose ONE of: indigo / emerald / slate / rose / amber / cyan

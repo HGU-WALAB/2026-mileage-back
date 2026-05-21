@@ -3,29 +3,39 @@
 The portfolio design MUST adapt based on the user-selected options in `[design_preferences]`.
 If the `[design_preferences]` block is missing or empty, **skip STEP 4 entirely** and use the default blue style in STEP 5-A.
 
-## 4-A. Layout Style
+## 4-A. Layout Style (archetypes — STEP 5 ships matching CSS + HTML skeleton)
+
 User may choose ONE of: 단일 칼럼 / 랜딩 페이지 / 사이드바 / 카드 그리드
 
-STEP 5 embeds a **layout-specific CSS + HTML skeleton** for the selected value. You **must** implement that layout — a generic stack of `.section-card` only is **wrong** when the user chose 랜딩/사이드바/그리드.
+| 레이아웃 | Archetype | Recommended theme | Body wrapper class |
+|----------|-----------|-------------------|-------------------|
+| 단일 칼럼 | **Typographic Editorial** | indigo | `.layout-editorial` |
+| 랜딩 페이지 | **Immersive Web** | cyan | `.layout-immersive` |
+| 사이드바 | **Dark Dev Portfolio** | emerald | `.layout-darkdev` |
+| 카드 그리드 | **Bento Dashboard** | amber | `.layout-bento` |
 
-### 단일 칼럼
-- `.page-single` max-width ~720px, centered; `.doc-header` with name/role; sections as `.section-card` in one column.
-- **No** full-width hero gradient, **no** sticky nav, **no** multi-column project grid.
+You **must** use the wrapper + class names from the embedded layout snippet. A generic vertical stack of `.section-card` only is **invalid** when the user chose 랜딩/사이드바/그리드.
 
-### 랜딩 페이지 (distinct from 단일 칼럼)
-- **Hero** (`.hero`): large type for name + role + one-line summary; **primary gradient** background (not neutral page gray).
-- **Sticky nav** (`.site-nav`) with anchor links to section IDs (`#about`, `#tech`, `#projects`, …).
-- **Section bands** (`.section-band`): alternating background (white vs `--page-bg`) or full-width separators — not one flat wall of cards.
-- **Featured projects** in `.projects-featured` **CSS grid** (2–3 columns on desktop); other projects in `.projects-other` below.
-- Main wrapper: `main.landing-main`.
+### 단일 칼럼 — Typographic Editorial
+- Serif + sans mix; italic bio pull-quote (`.editorial-bio`); timeline dots (`.editorial-timeline`).
+- Top **gradient banner** `.editorial-hero` (not a flat doc header only).
+- Max-width ~680px column `.editorial-body`; skills in **2-column** `.editorial-skills-grid`.
+- Print-friendly; document-style reading flow.
 
-### 사이드바
-- Shell `.layout-sidebar`: flex row with `.sidebar` (profile zone, tech, contact, separators) + `.main`.
-- Sidebar **sticky** on wide viewports; **not** a single full-width column.
+### 랜딩 페이지 — Immersive Web (≠ 단일 칼럼)
+- Full-bleed `.immersive-hero` gradient + decorative rings; `.immersive-nav` sticky with anchor links.
+- Alternating `.immersive-band--light` / `--tint` section backgrounds.
+- Projects in **3-column** `.projects-featured` grid; award activities as gradient `.immersive-activity-card.is-award`.
+- Footer `.immersive-footer-cta`.
 
-### 카드 그리드
-- `.page-grid` + `.cards-grid` with `grid-template-columns: repeat(auto-fill, minmax(280px, 1fr))`.
-- Each major topic is a `.grid-module` card in the grid — not one narrow column only.
+### 사이드바 — Dark Dev Portfolio
+- `.layout-darkdev`: dark sidebar `#0a0f0d` + light `.main`.
+- `.sidebar-avatar` (conic gradient), skill bars on dark track, `.sidebar-cert-pill`, dividers.
+- Main: `.main-bio-card`, stacked `.main-project-card`, `.main-activity-list`.
+
+### 카드 그리드 — Bento Dashboard
+- `.bento-grid` asymmetric `2fr 1fr 1fr`; `.bento-award-card` gradient highlight cell.
+- Dark `.bento-card--dark` for bio/contact; `.bento-project-card` per project; full-width activities row.
 
 ## 4-B. Color Theme
 User may choose ONE of: indigo / emerald / slate / rose / amber / cyan

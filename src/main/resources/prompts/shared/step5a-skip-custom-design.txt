@@ -24,11 +24,15 @@ Prefer Noto Sans KR for Korean body text.
 
 ---
 
-### Paste-ready baseline (adapt class names / tokens). Do not omit `@import`, `:root`, cards, skill bars, or `@media print`.
+### Color tokens — merge **after** shared `:root` in minimum snippet (overrides `--primary` / `--secondary` / `--track`):
+
+{{CSS_THEME_TOKENS}}
+
+### Paste-ready baseline (shared primitives: skill-row, tag-pill, section-label). Keep when merging layout CSS.
 
 {{CSS_MINIMUM_SNIPPET}}
 
-### Layout CSS for STEP 2 `레이아웃` — merge into your stylesheet and use the HTML skeleton classes (required; do not ignore):
+### Layout CSS for STEP 2 `레이아웃` — **required**; copy HTML skeleton comment at bottom of snippet into `<body>` structure:
 
 {{CSS_LAYOUT_SNIPPET}}
 

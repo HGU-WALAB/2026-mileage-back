@@ -513,13 +513,58 @@ public class PortfolioHtmlExportService {
     private String buildCustomDesignPromptBlock(DesignPreferencesDto prefs) {
         String headLinks = promptLoader.load("shared/head-font-links-mandatory.txt");
         String minimum = promptLoader.load("shared/step5-css-minimum-snippet.txt");
-        String layout = resolveLayoutSnippet(prefs != null ? prefs.getLayout() : null);
+        String layoutKey = prefs != null ? prefs.getLayout() : null;
+        String colorKey = prefs != null ? prefs.getColor_theme() : null;
+        String layout = resolveLayoutSnippet(layoutKey);
+        String theme = resolveThemeTokenSnippet(layoutKey, colorKey);
         String density = resolveDensitySnippet(prefs != null ? prefs.getDensity() : null);
         return promptLoader.load("shared/step5a-skip-custom-design.txt")
                 .replace("{{MANDATORY_HEAD_FONT_LINKS}}", headLinks)
+                .replace("{{CSS_THEME_TOKENS}}", theme)
                 .replace("{{CSS_MINIMUM_SNIPPET}}", minimum)
                 .replace("{{CSS_LAYOUT_SNIPPET}}", layout)
                 .replace("{{CSS_DENSITY_SNIPPET}}", density);
+    }
+
+    /**
+     * STEP 4-B color theme tokens; falls back to layout-recommended palette when color_theme is blank.
+     */
+    private String resolveThemeTokenSnippet(String layout, String colorTheme) {
+        if (colorTheme != null && !colorTheme.trim().isEmpty()) {
+            String c = colorTheme.trim().toLowerCase();
+            if (c.contains("인디고") || c.contains("indigo")) {
+                return promptLoader.load("shared/theme-tokens-indigo.txt");
+            }
+            if (c.contains("시안") || c.contains("cyan")) {
+                return promptLoader.load("shared/theme-tokens-cyan.txt");
+            }
+            if (c.contains("에메랄드") || c.contains("emerald")) {
+                return promptLoader.load("shared/theme-tokens-emerald.txt");
+            }
+            if (c.contains("앰버") || c.contains("amber")) {
+                return promptLoader.load("shared/theme-tokens-amber.txt");
+            }
+            if (c.contains("슬레이트") || c.contains("slate")) {
+                return "/* slate theme — map STEP 4 slate tokens to :root */\n"
+                        + ":root { --primary: #334155; --secondary: #64748b; --primary-soft: #cbd5e1; --track: #e2e8f0; }\n";
+            }
+            if (c.contains("로즈") || c.contains("rose")) {
+                return ":root { --primary: #f43f5e; --secondary: #fb7185; --primary-soft: #ffe4e6; --track: #fecdd3; }\n";
+            }
+        }
+        if (layout != null) {
+            String l = layout.trim();
+            if (l.contains("랜딩")) {
+                return promptLoader.load("shared/theme-tokens-cyan.txt");
+            }
+            if (l.contains("사이드바")) {
+                return promptLoader.load("shared/theme-tokens-emerald.txt");
+            }
+            if (l.contains("카드") && l.contains("그리드")) {
+                return promptLoader.load("shared/theme-tokens-amber.txt");
+            }
+        }
+        return promptLoader.load("shared/theme-tokens-indigo.txt");
     }
 
     /**

@@ -10,7 +10,7 @@ Output **only** a single JSON object that:
 3. Lists `[tech_stack]` skills that include **NN%** and how each will be visualized (e.g. horizontal progress bar row).
 4. Maps each planned “strength” or headline claim to ≥1 concrete STEP 2 line (`github_repos` title or `activities` title).
 5. States STEP 4-B color-token discipline when `[design_preferences]` exists: **`soft` never as full-page background**; neutral page wash only.
-6. Reads `[design_preferences]` **레이아웃** and sets `layout_implementation` to one of: `landing_hero_nav_grid` | `sidebar_two_column` | `card_grid` | `single_column_doc` (must match user choice — landing ≠ single column).
+6. Reads `[design_preferences]` **레이아웃** and sets `layout_implementation` to one of: `typographic_editorial` | `immersive_web` | `dark_dev_sidebar` | `bento_dashboard` (landing ≠ single column).
 7. Lists `awards_and_certs_found` by scanning mileage/activities for 수상·SQLD·OPIc·해커톤·대상 etc.; `achievements_section_required: true` when any found.
 8. Flags repo contribution bullets that are vague-only → `use_contribution_placeholder: true` per RULE 3-B.
 

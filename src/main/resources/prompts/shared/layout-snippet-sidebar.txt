@@ -1,58 +1,229 @@
-/* === LAYOUT: 사이드바 (MANDATORY when STEP 2 says 레이아웃: 사이드바) ===
-   Two-column shell: sticky sidebar + scrollable main. NOT a single full-width column stack. */
+/* ═══ LAYOUT: 사이드바 — "Dark Dev Portfolio" (recommended theme: emerald) ═══
+   Dark sticky sidebar + light main. Skill bars glow on dark. Classic dev portfolio.
+   Wrapper: .layout-darkdev .layout-sidebar */
 
+.layout-darkdev,
 .layout-sidebar {
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 0;
-  max-width: 1000px;
-  margin: 1.5rem auto;
-  background: var(--card-bg);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
-  overflow: visible;
+  min-height: 100vh;
+  font-family: var(--font-ui);
+  background: #f8fafc;
 }
+
+.layout-darkdev .sidebar,
 .layout-sidebar .sidebar {
-  width: 260px;
+  width: 252px;
   flex-shrink: 0;
-  padding: 1.75rem 1.25rem;
-  background: linear-gradient(180deg, var(--primary-soft) 0%, #fff 45%, var(--page-bg) 100%);
-  border-right: 1px solid var(--border);
+  background: #0a0f0d;
+  border-right: 1px solid rgba(16, 185, 129, 0.12);
+  padding: 32px 22px;
+  color: #9ca3af;
 }
 @media (min-width: 769px) {
+  .layout-darkdev .sidebar,
   .layout-sidebar .sidebar {
     position: sticky;
-    top: 1rem;
+    top: 0;
     align-self: flex-start;
-    max-height: calc(100vh - 2rem);
+    height: 100vh;
     overflow-y: auto;
   }
 }
-.layout-sidebar .sidebar .profile-zone {
-  padding-bottom: 1rem;
-  margin-bottom: 1rem;
-  border-bottom: 1px dashed var(--border);
+
+.sidebar-profile {
+  text-align: center;
+  margin-bottom: 28px;
 }
-.layout-sidebar .sidebar .sidebar-block {
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
+.sidebar-avatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  margin: 0 auto 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 900;
+  color: #fff;
+  background: conic-gradient(var(--primary), var(--secondary), var(--primary));
 }
-.layout-sidebar .main {
-  flex: 1;
-  padding: 1.5rem 1.5rem 1.75rem;
-  min-width: 0;
+.sidebar-profile .profile-name {
+  color: #f0fdf4;
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: -0.01em;
 }
-@media (max-width: 768px) {
-  .layout-sidebar { flex-direction: column; }
-  .layout-sidebar .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); position: static; max-height: none; }
+.sidebar-profile .profile-role {
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 12.5px;
+  margin-top: 3px;
+}
+.sidebar-profile .profile-school {
+  color: #4b5563;
+  font-size: 11px;
+  margin-top: 5px;
 }
 
-/* HTML skeleton:
-<div class="layout-sidebar">
-  <aside class="sidebar"><div class="profile-zone">...</div><div class="sidebar-block">TECH</div></aside>
-  <main class="main">...</main>
-</div>
+.sidebar-divider {
+  height: 1px;
+  background: rgba(16, 185, 129, 0.1);
+  margin: 20px -22px;
+}
+
+.sidebar-block-label {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #374151;
+  margin-bottom: 14px;
+}
+
+/* Dark sidebar skill bars */
+.layout-darkdev .sidebar .skill-meta .skill-name { color: #9ca3af; }
+.layout-darkdev .sidebar .skill-meta .skill-pct { color: var(--primary); opacity: 1; }
+.layout-darkdev .sidebar .skill-track { background: rgba(255, 255, 255, 0.06); }
+
+.sidebar-cert-pill {
+  display: inline-block;
+  margin-right: 5px;
+  margin-bottom: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--secondary);
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.sidebar-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+  color: #6b7280;
+}
+.sidebar-contact a {
+  color: #6b7280;
+  text-decoration: none;
+}
+
+.layout-darkdev .main,
+.layout-sidebar .main {
+  flex: 1;
+  padding: 32px 28px;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.main-bio-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 18px 22px;
+  border-left: 3px solid var(--primary);
+  margin-bottom: 24px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+.main-bio-card p {
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.8;
+  margin: 0;
+}
+
+.main-section-label {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 14px;
+}
+
+.main-project-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px 20px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 12px;
+}
+.main-project-card h3 {
+  font-size: 14px;
+  font-weight: 800;
+  color: #111;
+  margin: 0 0 6px;
+}
+.main-project-card .project-period {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.main-activity-list {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+.main-activity-row {
+  display: flex;
+  gap: 14px;
+  padding: 14px 20px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.main-activity-row:last-child { border-bottom: none; }
+.main-activity-row.is-award { background: #f0fdf4; }
+.main-activity-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  margin-top: 8px;
+  flex-shrink: 0;
+}
+.main-activity-row.is-award .main-activity-dot {
+  background: var(--primary);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+.main-activity-title {
+  font-weight: 700;
+  font-size: 13.5px;
+  color: #111;
+}
+.main-activity-row.is-award .main-activity-title { color: #065f46; }
+
+@media (max-width: 768px) {
+  .layout-darkdev,
+  .layout-sidebar { flex-direction: column; }
+  .layout-darkdev .sidebar,
+  .layout-sidebar .sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+  }
+}
+
+/*
+<body class="layout-darkdev layout-sidebar">
+  <aside class="sidebar">
+    <div class="sidebar-profile">
+      <div class="sidebar-avatar">홍</div>
+      <div class="profile-name">이름</div>
+      <div class="profile-role">직무</div>
+      <div class="profile-school">학과</div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-block"><div class="sidebar-block-label">기술 스택</div> skill-rows </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-block"><div class="sidebar-block-label">자격증</div> cert pills </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-contact">...</div>
+  </aside>
+  <main class="main">
+    <div class="main-bio-card"><p>...</p></div>
+    <section> projects / activities </section>
+  </main>
+</body>
 */

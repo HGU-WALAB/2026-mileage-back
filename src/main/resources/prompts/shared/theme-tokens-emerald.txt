@@ -1,0 +1,8 @@
+/* Theme: emerald — use when 색상 테마 is 에메랄드/emerald or layout is 사이드바 */
+:root {
+  --primary: #10b981;
+  --secondary: #34d399;
+  --primary-soft: rgba(16, 185, 129, 0.12);
+  --track: rgba(255, 255, 255, 0.06);
+  --page-bg: #f8fafc;
+}

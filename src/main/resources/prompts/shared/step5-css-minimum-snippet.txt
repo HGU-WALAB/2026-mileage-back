@@ -1,25 +1,30 @@
 <!--
-  Reference baseline for custom-design HTML (STEP 5-B). Adapt colors to STEP 4 tokens.
-  Include @import FIRST inside <style>; pair with Google Fonts <link> in <head>.
+  Shared primitives for all custom layouts. Map --primary/--secondary/--primary-soft to STEP 4 color theme.
+  Pairing guide: 단일 칼럼→indigo | 랜딩→cyan | 사이드바→emerald | 카드 그리드→amber
 -->
 <style>
-/* --- snippet start (merge into your stylesheet) --- */
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap");
+/* --- shared primitives (merge + keep when adding layout CSS) --- */
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap");
 
 :root {
   --page-bg: #f8fafc;
   --card-bg: #ffffff;
   --text: #111827;
+  --text-deep: #0f172a;
   --muted: #64748b;
-  --primary: #2563eb;
-  --primary-soft: #e5edff;
+  --primary: #4f46e5;
+  --secondary: #818cf8;
+  --primary-soft: #eef2ff;
+  --track: #e0e7ff;
   --border: rgba(148, 163, 184, 0.35);
   --radius: 14px;
+  --font-ui: "Noto Sans KR", "Inter", system-ui, sans-serif;
+  --font-serif: Georgia, "Noto Serif KR", "Noto Sans KR", serif;
 }
 
 html, body {
   margin: 0;
-  font-family: "Noto Sans KR", system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 15px;
   font-weight: 400;
   line-height: 1.55;
@@ -27,18 +32,67 @@ html, body {
   color: var(--text);
 }
 
-h1 { font-size: 1.75rem; font-weight: 700; line-height: 1.2; margin: 0 0 0.35em; }
-h2 { font-size: 1.28rem; font-weight: 700; line-height: 1.22; margin: 0 0 0.35em; }
-h3 { font-size: 1.08rem; font-weight: 600; line-height: 1.28; margin: 0 0 0.3em; }
-p  { margin: 0 0 0.65em; }
+h1, h2, h3, h4 {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text-deep);
+}
 
-.section-card {
-  background: var(--card-bg);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
-  padding: 1.1rem 1.25rem;
-  margin-bottom: 1rem;
+/* Skill bar (sidebar dark + all layouts) */
+.skill-row { margin-bottom: 11px; }
+.skill-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12.5px;
+  margin-bottom: 5px;
+}
+.skill-meta .skill-name { font-weight: 500; color: var(--text-deep); }
+.skill-meta .skill-pct { font-weight: 600; opacity: 0.75; color: var(--primary); }
+.skill-track {
+  height: 5px;
+  border-radius: 999px;
+  background: var(--track);
+  overflow: hidden;
+}
+.skill-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+}
+
+.tag-pill {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--primary-soft);
+  color: var(--primary);
+  margin-right: 4px;
+  margin-top: 3px;
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.section-label span {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.section-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--track), transparent);
 }
 
 .achievements-highlight {
@@ -62,36 +116,8 @@ p  { margin: 0 0 0.65em; }
   font-size: 0.9em;
 }
 
-/* Tech stack % — horizontal bar pattern */
-.skill-row { margin-bottom: 0.55rem; }
-.skill-meta {
-  display: flex; justify-content: space-between; align-items: baseline;
-  font-size: 0.88rem; margin-bottom: 0.2rem;
-}
-.skill-track {
-  height: 8px; border-radius: 999px;
-  background: #e2e8f0; overflow: hidden;
-}
-.skill-fill {
-  height: 100%; border-radius: 999px;
-  background: linear-gradient(90deg, var(--primary), #6366f1);
-}
-
 @media print {
   body { font-size: 11pt; line-height: 1.45; background: #fff !important; color: #000 !important; }
-  .section-card { box-shadow: none !important; break-inside: avoid; page-break-inside: avoid; }
   a { color: #000 !important; text-decoration: underline; }
 }
-/* --- snippet end --- */
 </style>
-
-<!--
-HTML usage example (inside body):
-<div class="section-card">
-  <h2>Core Tech Stack</h2>
-  <div class="skill-row">
-    <div class="skill-meta"><span>Java</span><span>70%</span></div>
-    <div class="skill-track"><div class="skill-fill" style="width:70%"></div></div>
-  </div>
-</div>
--->
