@@ -1,0 +1,58 @@
+/* === LAYOUT: 사이드바 (MANDATORY when STEP 2 says 레이아웃: 사이드바) ===
+   Two-column shell: sticky sidebar + scrollable main. NOT a single full-width column stack. */
+
+.layout-sidebar {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0;
+  max-width: 1000px;
+  margin: 1.5rem auto;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+  overflow: visible;
+}
+.layout-sidebar .sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  padding: 1.75rem 1.25rem;
+  background: linear-gradient(180deg, var(--primary-soft) 0%, #fff 45%, var(--page-bg) 100%);
+  border-right: 1px solid var(--border);
+}
+@media (min-width: 769px) {
+  .layout-sidebar .sidebar {
+    position: sticky;
+    top: 1rem;
+    align-self: flex-start;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+  }
+}
+.layout-sidebar .sidebar .profile-zone {
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px dashed var(--border);
+}
+.layout-sidebar .sidebar .sidebar-block {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+.layout-sidebar .main {
+  flex: 1;
+  padding: 1.5rem 1.5rem 1.75rem;
+  min-width: 0;
+}
+@media (max-width: 768px) {
+  .layout-sidebar { flex-direction: column; }
+  .layout-sidebar .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); position: static; max-height: none; }
+}
+
+/* HTML skeleton:
+<div class="layout-sidebar">
+  <aside class="sidebar"><div class="profile-zone">...</div><div class="sidebar-block">TECH</div></aside>
+  <main class="main">...</main>
+</div>
+*/

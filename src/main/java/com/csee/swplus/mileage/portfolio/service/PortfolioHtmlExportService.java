@@ -151,7 +151,7 @@ public class PortfolioHtmlExportService {
      */
     public String buildFullPrompt(Users user) {
         String inputData = buildPromptInputData(user);
-        return cvPromptHead() + inputData + "\n```\n\n" + buildCvPromptAfterStep2(true);
+        return cvPromptHead() + inputData + "\n```\n\n" + buildCvPromptAfterStep2(true, null);
     }
 
     /**
@@ -214,10 +214,13 @@ public class PortfolioHtmlExportService {
     private static final class CompiledPortfolioPromptInput {
         private final String step2Body;
         private final boolean embedLegacyCss;
+        private final DesignPreferencesDto designPreferences;
 
-        private CompiledPortfolioPromptInput(String step2Body, boolean embedLegacyCss) {
+        private CompiledPortfolioPromptInput(String step2Body, boolean embedLegacyCss,
+                DesignPreferencesDto designPreferences) {
             this.step2Body = step2Body;
             this.embedLegacyCss = embedLegacyCss;
+            this.designPreferences = designPreferences;
         }
     }
 
@@ -308,7 +311,7 @@ public class PortfolioHtmlExportService {
         appendDesignPreferencesBlock(sb, request.getDesign_preferences());
 
         boolean embedLegacyCss = !hasEffectiveDesignPreferences(request.getDesign_preferences());
-        return new CompiledPortfolioPromptInput(sb.toString(), embedLegacyCss);
+        return new CompiledPortfolioPromptInput(sb.toString(), embedLegacyCss, request.getDesign_preferences());
     }
 
     private CompiledPortfolioPromptInput compileArchivePortfolioInput(Users user, CvBuildPromptRequest request) {
@@ -418,7 +421,7 @@ public class PortfolioHtmlExportService {
         appendDesignPreferencesBlock(sb, request.getDesign_preferences());
 
         boolean embedLegacyCss = !hasEffectiveDesignPreferences(request.getDesign_preferences());
-        return new CompiledPortfolioPromptInput(sb.toString(), embedLegacyCss);
+        return new CompiledPortfolioPromptInput(sb.toString(), embedLegacyCss, request.getDesign_preferences());
     }
 
     private String assembleCvHtmlPrompt(CompiledPortfolioPromptInput in,
@@ -435,7 +438,7 @@ public class PortfolioHtmlExportService {
             out.append(portfolioPlanJsonOrNull.trim());
             out.append("\n```\n\n");
         }
-        out.append(buildCvPromptAfterStep2(in.embedLegacyCss));
+        out.append(buildCvPromptAfterStep2(in.embedLegacyCss, in.designPreferences));
         return out.toString();
     }
 
@@ -453,7 +456,7 @@ public class PortfolioHtmlExportService {
             out.append(portfolioPlanJsonOrNull.trim());
             out.append("\n```\n\n");
         }
-        out.append(buildArchivePromptAfterStep2(in.embedLegacyCss));
+        out.append(buildArchivePromptAfterStep2(in.embedLegacyCss, in.designPreferences));
         return out.toString();
     }
 
@@ -473,7 +476,7 @@ public class PortfolioHtmlExportService {
     }
 
     /** STEP 3–7 fragments after the STEP 2 closing fence (call {@link #assembleCvHtmlPrompt} for full document). */
-    private String buildCvPromptAfterStep2(boolean embedLegacyCss) {
+    private String buildCvPromptAfterStep2(boolean embedLegacyCss, DesignPreferencesDto designPreferences) {
         String css = promptLoader.defaultBlueCss();
         StringBuilder tail = new StringBuilder();
         tail.append(promptLoader.load("cv/step3-rules.txt"));
@@ -484,15 +487,13 @@ public class PortfolioHtmlExportService {
                     .replace("{{CSS}}", css)
                     .replace("{{HTML_TITLE}}", "[name] · Portfolio"));
         } else {
-            String snippet = promptLoader.load("shared/step5-css-minimum-snippet.txt");
-            tail.append(promptLoader.load("shared/step5a-skip-custom-design.txt")
-                    .replace("{{CSS_MINIMUM_SNIPPET}}", snippet));
+            tail.append(buildCustomDesignPromptBlock(designPreferences));
         }
         tail.append(promptLoader.load("cv/step5b-through-step7.txt"));
         return tail.toString();
     }
 
-    private String buildArchivePromptAfterStep2(boolean embedLegacyCss) {
+    private String buildArchivePromptAfterStep2(boolean embedLegacyCss, DesignPreferencesDto designPreferences) {
         String css = promptLoader.defaultBlueCss();
         StringBuilder tail = new StringBuilder();
         tail.append(promptLoader.load("archive/step3-rules.txt"));
@@ -503,12 +504,56 @@ public class PortfolioHtmlExportService {
                     .replace("{{CSS}}", css)
                     .replace("{{HTML_TITLE}}", "[name] · Reflection Profile"));
         } else {
-            String snippet = promptLoader.load("shared/step5-css-minimum-snippet.txt");
-            tail.append(promptLoader.load("shared/step5a-skip-custom-design.txt")
-                    .replace("{{CSS_MINIMUM_SNIPPET}}", snippet));
+            tail.append(buildCustomDesignPromptBlock(designPreferences));
         }
         tail.append(promptLoader.load("archive/step5b-through-step7.txt"));
         return tail.toString();
+    }
+
+    private String buildCustomDesignPromptBlock(DesignPreferencesDto prefs) {
+        String headLinks = promptLoader.load("shared/head-font-links-mandatory.txt");
+        String minimum = promptLoader.load("shared/step5-css-minimum-snippet.txt");
+        String layout = resolveLayoutSnippet(prefs != null ? prefs.getLayout() : null);
+        String density = resolveDensitySnippet(prefs != null ? prefs.getDensity() : null);
+        return promptLoader.load("shared/step5a-skip-custom-design.txt")
+                .replace("{{MANDATORY_HEAD_FONT_LINKS}}", headLinks)
+                .replace("{{CSS_MINIMUM_SNIPPET}}", minimum)
+                .replace("{{CSS_LAYOUT_SNIPPET}}", layout)
+                .replace("{{CSS_DENSITY_SNIPPET}}", density);
+    }
+
+    /**
+     * Maps Korean layout labels from the FE to a paste-ready CSS/HTML skeleton fragment.
+     */
+    private String resolveLayoutSnippet(String layout) {
+        if (layout == null || layout.trim().isEmpty()) {
+            return promptLoader.load("shared/layout-snippet-single-column.txt");
+        }
+        String l = layout.trim();
+        if (l.contains("랜딩")) {
+            return promptLoader.load("shared/layout-snippet-landing.txt");
+        }
+        if (l.contains("사이드바")) {
+            return promptLoader.load("shared/layout-snippet-sidebar.txt");
+        }
+        if (l.contains("카드") && l.contains("그리드")) {
+            return promptLoader.load("shared/layout-snippet-card-grid.txt");
+        }
+        if (l.contains("단일") || l.contains("칼럼") || l.contains("컬럼")) {
+            return promptLoader.load("shared/layout-snippet-single-column.txt");
+        }
+        return promptLoader.load("shared/layout-snippet-single-column.txt");
+    }
+
+    private String resolveDensitySnippet(String density) {
+        if (density == null || density.trim().isEmpty()) {
+            return "(No 1-page density snippet — STEP 2 밀도 is not \"1페이지 내\".)";
+        }
+        String d = density.trim();
+        if (d.contains("1페이지") || d.contains("1 페이지")) {
+            return promptLoader.load("shared/density-snippet-one-page.txt");
+        }
+        return "(Density is not 1페이지 내 — optional spacing; do not hide .secondary-* items.)";
     }
 
     private static boolean hasEffectiveDesignPreferences(DesignPreferencesDto p) {

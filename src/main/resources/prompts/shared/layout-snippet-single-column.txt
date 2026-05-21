@@ -1,0 +1,25 @@
+/* === LAYOUT: 단일 칼럼 (MANDATORY when STEP 2 says 레이아웃: 단일 칼럼) ===
+   One centered column — document/resume flow. No hero gradient, no project grid, no sticky nav required. */
+
+.page-single {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 2.5rem;
+}
+.page-single .doc-header {
+  border-bottom: 2px solid var(--primary);
+  padding-bottom: 1rem;
+  margin-bottom: 1.25rem;
+}
+.page-single .doc-header h1 { font-size: 1.65rem; margin: 0 0 0.25em; }
+.page-single .section-card {
+  margin-bottom: 1rem;
+  page-break-inside: avoid;
+}
+
+/* HTML skeleton:
+<div class="page-single">
+  <header class="doc-header"><h1>이름</h1><p class="role-line">직무</p></header>
+  <section class="section-card">...</section>
+</div>
+*/

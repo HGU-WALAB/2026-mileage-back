@@ -1,0 +1,37 @@
+/* === LAYOUT: 카드 그리드 (MANDATORY when STEP 2 says 레이아웃: 카드 그리드) === */
+
+.page-grid {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 2rem;
+}
+.page-grid .grid-header {
+  margin-bottom: 1.25rem;
+}
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+.cards-grid .section-card,
+.cards-grid .grid-module {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.cards-grid .grid-module h2 {
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--primary);
+  margin-bottom: 0.65rem;
+}
+
+/* HTML skeleton:
+<div class="page-grid">
+  <header class="grid-header">...</header>
+  <div class="cards-grid">
+    <article class="grid-module section-card">...</article>
+  </div>
+</div>
+*/
