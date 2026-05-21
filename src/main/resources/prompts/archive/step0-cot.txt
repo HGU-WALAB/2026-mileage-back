@@ -1,13 +1,14 @@
-# STEP 0: SILENT PRE-FLIGHT (do NOT output this section — internal reasoning only)
+# STEP 0: SILENT PRE-FLIGHT (do NOT output — Archive mentor mode)
 
-Before writing HTML, mentally complete:
+Before HTML, mentally complete:
 
-1. **Color tokens:** Page background neutral; **`soft`** never full-page.
-2. **Duplicates:** Merge duplicate `[activities]` topics into one narrative card.
-3. **Tech stack %:** Preserve every NN% from STEP 2 with visible visualization.
-4. **Repos:** Surface 기간·팀·역할·주요 기여 lines when present in STEP 2.
-5. **Strengths:** Each bullet cites ≥1 `[activities]` or `[github_repos]` line by name.
+1. **Evidence density:** For top `[tech_stack]` skills with %, count matching repos/activities by name; note empty repo descriptions.
+2. **Patterns:** Find ≥2 recurring themes across activities/mileage/repos (teaching, off-track tech, year clusters).
+3. **Strengths depth:** Plan 2–4 paragraphs (not 3 one-liners) — each with evidence list + limit.
+4. **Gaps:** Compare tech_stack % to repo/activity keywords — no generic "study more X".
+5. **Direction:** trajectory sentence + bottleneck + 3 numbered next steps tied to gaps.
+6. **Sections:** STEP 6 order §1→§8 — do not stop after strengths+gaps only.
 
-Then continue with STEP 1–7. Output remains HTML only.
+Then output HTML only.
 
 ---

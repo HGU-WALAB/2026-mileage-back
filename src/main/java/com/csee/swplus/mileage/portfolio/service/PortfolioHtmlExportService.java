@@ -499,6 +499,7 @@ public class PortfolioHtmlExportService {
         tail.append(promptLoader.load("archive/step3-rules.txt"));
         tail.append(promptLoader.load("archive/step4-design.txt"));
         tail.append(promptLoader.load("archive/step5-intro.txt"));
+        tail.append(promptLoader.load("archive/step6-mentor-structure.txt"));
         if (embedLegacyCss) {
             tail.append(promptLoader.load("shared/step5a-legacy-archive.txt")
                     .replace("{{CSS}}", css)

@@ -11,26 +11,15 @@ You may freely choose CSS structure, class naming, spacing system, typography sc
 
 ---
 
-# STEP 6: CONTENT STRUCTURE REQUIREMENTS
-
-Recommended reflective sections (omit empty sections automatically):
-- Header / Intro
-- About Me (reflective) — no vague hype without STEP 2 anchor (RULE 2)
-- Tech Evidence — **must show `[tech_stack]` percentages when present** (RULE 6); relate numbers to repos/activities where possible
-- Activities / Experience (chronological) — apply duplicate merge (RULE 5)
-- Coursework & Mileage
-- Projects & Repos
-- Strengths — **each item cites ≥1 activity or repo** (RULE 2)
-- Gaps & Next Steps — **evidence-derived only** (RULE 3)
-- Contact
-
----
 
 # STEP 7: QUALITY CHECKLIST (silent, before output)
 - [ ] When `# PORTFOLIO_PLAN_JSON` is present, outline / merges / `%` visualization follow it — facts still bound to STEP 2 only
-- [ ] Tone is reflective, not resume hype
-- [ ] Strengths: every bullet cites at least one STEP 2 activity or repo by name
-- [ ] Gaps/growth: no generic-only tips; each tied to STEP 2 contrast (tech_stack vs repos/activities)
+- [ ] Tone is reflective mentor — not resume hype, not shallow brevity
+- [ ] STEP 6 §1–8 present when data allows (especially §2 evidence density, §4 patterns, §5–7 depth)
+- [ ] §2: each major tech_stack % has evidence **count** + interpretation (RULE 11)
+- [ ] §4: ≥2 patterns with ≥2 citations each + reflective question (RULE 12)
+- [ ] §5 strengths: 2–4 **paragraphs** with evidence list + limit — not one-liners (RULE 13)
+- [ ] §6–7: gaps show tech_stack vs repo contrast; direction has trajectory + bottleneck + 3 numbered steps (RULE 14)
 - [ ] `[tech_stack]` percentages rendered wherever STEP 2 includes %
 - [ ] No duplicate activity cards for the same project/topic (RULE 5)
 - [ ] No fabricated facts; gaps/growth tied to missing data only

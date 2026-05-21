@@ -22,5 +22,10 @@ Required top-level keys (use empty arrays/objects when unused):
 - **secondary_items_to_hide** (array): project/activity titles to mark `.secondary-*` when density is one page
 - **link_targets** (array): `{ "title", "url", "kind": "repo|activity|github_profile|email" }` from STEP 2 only
 - **description_rewrite** (array): `{ "source_title", "rewritten_ko", "tech_cited": [] }` per RULE 10 — tags/original only
+- **tech_evidence_density** (array): archive mentor — skill, pct, evidence_count, repo/activity names, interpretation_ko
+- **patterns** (array): theme, citations[], reflective_question_ko
+- **strengths_deep** (array): claim, evidence_names[], stack_link, limit_ko
+- **gaps_contrast** (array): gap_ko, compared[], interpretation_ko
+- **direction** (object): trajectory_ko, bottleneck_ko, next_steps[{ rank, action_ko, why_ko }]
 
 No prose outside JSON (except optional single ```json fence pair).

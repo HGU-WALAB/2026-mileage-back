@@ -1,0 +1,91 @@
+# STEP 6: CONTENT STRUCTURE — 비취준생(Archive) 멘토 모드
+
+This is **not** a recruiter CV. The student reads this to understand **where they are**, **what the data actually shows**, and **what to do next**. Shallow output (3 generic strength lines + 2 vague gap lines) is **invalid**.
+
+Render sections **in this order** (omit only when STEP 2 has zero data for that section). Use clear `<section id="...">` + `<h2>` headings in Korean.
+
+---
+
+## 1. 현재 위치 요약 (`#snapshot`)
+- 3–5 sentences: 학년/학기(`[bio]`), 관심·초점(`[self_assessment_context]`), 한줄 자기소개, **지금 시점**에서의 포지션.
+- Example angle: "4학년, 백엔드 중심으로 실무형 경험이 2024년부터 촘촘해짐" — every clause anchored to STEP 2 dates/names.
+
+## 2. 기술 스택 증거 밀도 (`#tech-evidence-density`)
+**Mandatory mentor analysis** — do not only list % bars.
+
+For **each major skill** in `[tech_stack]` that has **NN%** (especially top 3–5 by %):
+- State the **declared %** from STEP 2.
+- Count **concrete evidence pieces** visible in STEP 2 only:
+  - How many `[github_repos]` mention that tech in `· 기술:` / title / description?
+  - How many `[activities]` / `[mileage_list]` lines mention it in text or tags?
+- Write one sentence of interpretation, e.g.:
+  - "Spring Boot 90% 대비 레포·활동에서 명시된 사례 N개 — 가장 두꺼운 축"
+  - "AWS 30%이나 배포/인프라 키워드가 있는 레포 0개 — 스택 대비 가시 증거 부족"
+- If `[github_repos]` has **empty or very short `· 설명:`** lines, count them: "설명 없는 레포 X/Y개 → 외부에서 깊이 확인 어려움" (only if true in STEP 2).
+
+Present as a **table or stacked cards** (skill | % | evidence count | 한줄 해석).
+
+## 3. 활동 · 교과 타임라인 (`#timeline`)
+- `[activities]` in STEP 2 order (chronological); merge duplicates (RULE 5).
+- Optionally compress `[mileage_list]` into a compact sub-block or semester chips — do not drop selected mileage.
+- Visual: timeline, table, or dated cards — not a wall of identical bullets.
+
+## 4. 패턴 분석 (`#patterns`) — **REQUIRED when ≥3 activities or ≥3 mileage lines**
+Read **all** of `[activities]`, `[mileage_list]`, `[github_repos]` together and surface **2–4 patterns** the data suggests. Each pattern must:
+- Name the **repeating theme** (e.g. 교육/티칭, Flutter, 2024 실무 집중).
+- Cite **≥2 distinct STEP 2 lines** (activity titles, mileage lines, or repo names).
+- End with an **open reflective question** (not a verdict): "의도적 선택인가, 우연인가?" / "다음에 이걸 살릴 방향은?"
+
+Examples of valid pattern types (only if supported by data):
+- Same **role type** repeating (튜터, 리더, 해커톤, 연구실).
+- **Tech outside main track** appearing repeatedly (e.g. Flutter while targeting backend).
+- **Time clustering** (e.g. 2024~ 실무·리더·연구 집중 = 성장 변곡점).
+
+Do **not** invent psychology; stay descriptive + questioning.
+
+## 5. 강점 (`#strengths`) — evidence **thickness**, not "했다"
+**Minimum 2, maximum 4** items. Each item is **one short paragraph** (3–5 sentences), NOT a single hype line.
+
+Each paragraph MUST include:
+1. **Claim** (what is strong) — grounded in STEP 2.
+2. **Evidence inventory**: list **named** repos/activities (≥2 when possible) that support it.
+3. **Density vs stack**: relate to `[tech_stack]` % if relevant ("가장 두꺼운 축").
+4. **Limit / blind spot** visible in the same data (e.g. README 없음, 설명 빈약, 특정 기술은 활동만 있고 레포 없음).
+
+**Invalid:** "백엔드 설계 역량 강화 (PARD 서버 개발)" only.
+**Valid:** "Spring Boot 관련 증거가 STEP 2 기준 레포 A, B, 활동 C, D, E, F로 가장 많음. 다만 9개 레포 중 `· 설명:`이 비어 있는 것이 N개라 아키텍처 깊이는 외부에서 확인하기 어렵다."
+
+## 6. 단점 · 갭 (`#gaps`) — contrast, not generic advice
+**Minimum 2, maximum 4** items. Each gap MUST show **what you compared**:
+- `[tech_stack]` % or skill name **vs** `[github_repos]` / `[activities]` mentions (explicit contrast).
+- Missing field types: empty descriptions, no URL, no deployment keywords, etc. — only if visible in STEP 2.
+
+**Forbidden:** stand-alone "AWS를 공부하세요", "열심히 하세요".
+
+**Valid:** "`[tech_stack]`에 AWS/Docker 각 30%이나, 선택된 레포 9개 중 배포·CI·인프라 키워드가 있는 항목이 없음 → 스택 대비 포트폴리오 가시 증거 부족."
+
+## 7. 방향성 (`#direction`) — trajectory + prioritized next steps
+**Required** subsection structure:
+
+### 현재 trajectory (2–4 sentences)
+- Summarize momentum from timeline + evidence density (where weight is **actually** accumulating in STEP 2).
+
+### 병목 (1–2 bullets)
+- The **single biggest bottleneck** from section 6 / tech density — data-backed.
+
+### 다음 단계 우선순위 (numbered 1–3)
+- Each step: **action** + **why** (tie to gap above) + **which existing repo/activity could host it** if applicable in STEP 2.
+- Ordered by impact for **making growth visible in portfolio data**, not generic career advice.
+
+## 8. 연락처 (`#contact`)
+- `[contact]` block: GitHub + Email as RULE 9 links.
+
+---
+
+## Optional (after core 8, only if data exists)
+- **Projects & Repos** detail cards (if not fully covered in timeline) — RULE 7 fields.
+- **Coursework & Mileage** — if not folded into timeline.
+
+## Explicitly de-emphasize in Archive mode
+- Do **not** treat this as a one-page job application.
+- Do **not** end the document after only "강점 3줄 + 갭 2줄" — sections 2, 4, 5, 6, 7 are **mandatory** when STEP 2 has sufficient data.

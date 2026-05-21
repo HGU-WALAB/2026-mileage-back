@@ -10,23 +10,24 @@
 - Describe what the data actually shows: what they did, what they likely learned, where evidence is thin.
 - Do **not** use recruiter-style puffery or the "language calibration" rewrite table from sales CVs.
 - **Banned without proof:** phrases like "깊은 이해", "풍부한 경험", "탄탄한 역량", "뛰어난", "탁월한" unless the **same sentence** cites a concrete fact from STEP 2 (repo name, activity title, award name, or tool used in a named project).
-- **Strengths / 강점 섹션:** Each strength bullet (or paragraph) must **cite at least one** line from `[activities]` or `[github_repos]` — e.g. activity title in parentheses or a quoted repo name. If you cannot tie a strength to STEP 2, **omit** that bullet.
+- **Strengths / 강점:** See **RULE 13** — one-line "했다" summaries are insufficient in Archive mode.
 
 ## RULE 3: Gaps and growth (evidence-bound)
-- Call out **gaps** only from what is missing, empty, or weak in STEP 2.
-- Suggest **growth areas** as concrete, student-appropriate next steps — not invented achievements.
-- **No generic-only advice.** Do not write stand-alone lines like "AWS를 더 공부하세요" that apply to anyone. Tie every growth item to STEP 2: e.g. if `[tech_stack]` shows AWS at NN% but `[github_repos]` / activities rarely mention deployment/infra, say that **comparison explicitly**, then suggest infra-facing evidence (portfolio project, IaC, etc.).
-- Each gap/growth bullet should imply **what evidence was checked** (tech_stack vs repos vs activities).
+- See **RULE 14** (단점·갭) and **STEP 6 §7 방향성** — gaps must include **tech_stack vs repos/activities contrast**; growth must be **numbered priorities**, not a single generic study tip.
+- **No generic-only advice.** Stand-alone "AWS를 더 공부하세요" without citing which repos lack deployment evidence is **forbidden**.
 
 ## RULE 4: Zero fabrication
 - Never invent metrics, employers, awards, or repos not in STEP 2.
 - If a section has no lines, omit it or note clearly that nothing was selected.
 
-## RULE 5–8 테마 (Portfolio HTML 무결성 — 아래 번호 규칙과 함께)
-1. **Tech stack 시각화:** RULE 6 — 모든 NN% 유지·가시화.
-2. **중복 활동 병합:** RULE 5 — 유사 활동 단일 카드.
-3. **Repo 해석 깊이:** RULE 7 — 기간·팀·역할·기여 라인 전부 노출(존재 시).
-4. **강점 근거:** RULE 2·8 — 강점마다 활동/레포 제목 인용.
+## RULE 5–14 테마 (Archive 멘토 분석 — 생략 불가)
+1. **증거 밀도:** RULE 11 — % vs 실제 레포·활동 개수 대조.
+2. **패턴 분석:** RULE 12 — 반복 주제 2–4개, 각각 ≥2 STEP 2 인용.
+3. **Tech stack 시각화:** RULE 6 — 모든 NN% 유지·가시화.
+4. **중복 활동 병합:** RULE 5 — 유사 활동 단일 카드.
+5. **Repo 해석 깊이:** RULE 7 — 기간·팀·역할·기여 라인 전부 노출(존재 시).
+6. **강점 두께:** RULE 13 — 문단당 증거 목록 + 한계.
+7. **방향성:** RULE 14 + STEP 6 §7 — trajectory / 병목 / 우선순위 3가지.
 
 ## RULE 5: Duplicate activities (`[activities]`)
 - If two or more entries are clearly the **same project/topic** (same title after trimming case-insensitive, or overlapping distinctive keywords + same role), **merge** into one narrative card/timeline row: combine periods or show both ranges once — **do not** show two identical cards side-by-side.
@@ -38,8 +39,26 @@
 ## RULE 7: GitHub repos depth (`[github_repos]` detail lines)
 - Mirror CV/recruiter RULE 7: when STEP 2 lists **기간**, **팀 구성**, **내 역할**, **주요 기여** under a repo, those lines **must** appear in HTML as bullets or sub-blocks; skip lines that do not exist (no placeholders).
 
-## RULE 8: Strength citations (explicit)
-- Restates RULE 2: each reflective strength bullet cites ≥1 concrete STEP 2 title from `[activities]` or `[github_repos]` by name in the same bullet or sentence.
+## RULE 8: Strength citations (minimum bar)
+- Every strength paragraph cites **≥2** distinct STEP 2 names when the data allows; never a claim with zero named evidence.
+
+## RULE 11: 기술 스택 증거 밀도 (멘토 분석)
+- For each major `[tech_stack]` line with **NN%**, report: declared %, **count** of supporting repos/activities/mileage lines (by name), one-line interpretation.
+- Explicitly note mismatches: high % but zero mentions, or many repos with **empty** `· 설명:` — count only if true in STEP 2.
+- Section **§2 기술 스택 증거 밀도** in STEP 6 is mandatory when `[tech_stack]` is non-empty.
+
+## RULE 12: 패턴 분석
+- Section **§4 패턴 분석** required when STEP 2 has ≥3 activities OR ≥3 mileage lines.
+- Each pattern: theme label + **≥2 citations** + reflective question (no fabricated intent).
+- Scan for: repeated roles (교육/튜터/봉사), off-track tech vs stated focus, year/semester clustering.
+
+## RULE 13: 강점 — 증거 두께 (not shallow)
+- **2–4 paragraphs**, each 3–5 sentences: claim → named evidence list (prefer ≥2) → link to stack density → **limit** visible in same data (README/설명 부재 등).
+- Forbidden: single-line "역량 강화 (활동명 1개)" as the entire strength section.
+
+## RULE 14: 단점·갭·방향성
+- **단점·갭:** each item must state compared sources (`tech_stack` vs `github_repos` / `activities`).
+- **방향성:** three sub-parts — (1) 현재 trajectory, (2) 병목 1–2개, (3) numbered next steps 1–3 tied to gaps; optional "which existing repo to extend" when STEP 2 lists one.
 
 ## RULE 9: 링크 처리
 - `[github_repos]`에 `· URL:` 이 있으면 제목을 `<a href="[url]" target="_blank" rel="noopener noreferrer">[제목] ↗</a>` 로 렌더링.
