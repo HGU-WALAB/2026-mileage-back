@@ -1,0 +1,48 @@
+/* === DENSITY: 1페이지 내 (MANDATORY when STEP 2 밀도 is 1페이지 내) === */
+
+body.density-one-page,
+.density-one-page {
+  font-size: 13px;
+  line-height: 1.4;
+}
+.density-one-page .section-card,
+.density-one-page .section-band {
+  padding: 0.55rem 0.75rem !important;
+  margin-bottom: 0.45rem !important;
+}
+.density-one-page .hero { padding: 1.25rem 1rem 1rem !important; }
+.density-one-page .hero .hero-name { font-size: 1.45rem !important; }
+.density-one-page .skill-row { margin-bottom: 0.35rem !important; }
+.density-one-page .skill-track { height: 6px !important; }
+/* Screen: cap visible projects/activities */
+.density-one-page .secondary-activity,
+.density-one-page .secondary-mileage,
+.density-one-page .project-card.secondary-project {
+  display: none !important;
+}
+/* Keep top 3 featured projects + awards block visible */
+.density-one-page .achievements-highlight { display: block !important; }
+
+@media print {
+  .density-one-page,
+  body.density-one-page {
+    font-size: 10pt !important;
+    line-height: 1.35 !important;
+  }
+  .density-one-page .secondary-activity,
+  .density-one-page .secondary-mileage,
+  .density-one-page .project-card.secondary-project,
+  .density-one-page .site-nav {
+    display: none !important;
+  }
+  .density-one-page .section-card {
+    padding: 0.6rem 0.8rem !important;
+    margin-bottom: 0.5rem !important;
+    box-shadow: none !important;
+  }
+  .density-one-page .hero {
+    padding: 0.75rem 0.9rem !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

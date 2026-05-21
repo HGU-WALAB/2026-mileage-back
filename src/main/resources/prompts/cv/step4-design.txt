@@ -6,11 +6,26 @@ If the `[design_preferences]` block is missing or empty, **skip STEP 4 entirely*
 ## 4-A. Layout Style
 User may choose ONE of: 단일 칼럼 / 랜딩 페이지 / 사이드바 / 카드 그리드
 
-Layout guidelines:
-- 단일 칼럼: Resume/document style, vertical reading flow, print-friendly priority
-- 랜딩 페이지: Hero section emphasis, modern section transitions, project-first presentation
-- 사이드바: Persistent profile/info area, main content separated, traditional developer portfolio structure
-- 카드 그리드: Card-based modular sections, strong visual separation, suitable for project-heavy candidates
+STEP 5 embeds a **layout-specific CSS + HTML skeleton** for the selected value. You **must** implement that layout — a generic stack of `.section-card` only is **wrong** when the user chose 랜딩/사이드바/그리드.
+
+### 단일 칼럼
+- `.page-single` max-width ~720px, centered; `.doc-header` with name/role; sections as `.section-card` in one column.
+- **No** full-width hero gradient, **no** sticky nav, **no** multi-column project grid.
+
+### 랜딩 페이지 (distinct from 단일 칼럼)
+- **Hero** (`.hero`): large type for name + role + one-line summary; **primary gradient** background (not neutral page gray).
+- **Sticky nav** (`.site-nav`) with anchor links to section IDs (`#about`, `#tech`, `#projects`, …).
+- **Section bands** (`.section-band`): alternating background (white vs `--page-bg`) or full-width separators — not one flat wall of cards.
+- **Featured projects** in `.projects-featured` **CSS grid** (2–3 columns on desktop); other projects in `.projects-other` below.
+- Main wrapper: `main.landing-main`.
+
+### 사이드바
+- Shell `.layout-sidebar`: flex row with `.sidebar` (profile zone, tech, contact, separators) + `.main`.
+- Sidebar **sticky** on wide viewports; **not** a single full-width column.
+
+### 카드 그리드
+- `.page-grid` + `.cards-grid` with `grid-template-columns: repeat(auto-fill, minmax(280px, 1fr))`.
+- Each major topic is a `.grid-module` card in the grid — not one narrow column only.
 
 ## 4-B. Color Theme
 User may choose ONE of: indigo / emerald / slate / rose / amber / cyan
@@ -34,8 +49,8 @@ Color usage rules:
 Do not introduce unrelated dominant colors.
 
 ## 4-C. Density Mode
-- 1페이지 내: Compress spacing, prioritize strongest projects only, reduce verbose descriptions, optimize for A4 print
-- 페이지 제한 없음: Allow detailed descriptions, include additional activities/projects, more breathing room and spacing, richer section hierarchy
+- **1페이지 내:** Add class `density-one-page` on `<body>`. Merge STEP 5 **density CSS snippet**. Mark at most **3** featured projects without `.secondary-project`; hide extra projects/activities/mileage with `.secondary-project` / `.secondary-activity` / `.secondary-mileage` (hidden in screen + print). Compress padding; print `font-size: 10pt`. Tech stack: show top skills by % or compact pills — do not list 9 full progress bars if that breaks one A4 page.
+- **페이지 제한 없음:** Full detail allowed; do not apply `.secondary-*` hiding.
 
 ## 4-D. Additional Custom Requests
 Reflect extra user customization (preferred emphasis areas, section reorder requests, wording preferences) unless they conflict with honesty, readability, accessibility, or print usability.

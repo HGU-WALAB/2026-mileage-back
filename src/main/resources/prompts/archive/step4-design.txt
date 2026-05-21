@@ -5,11 +5,12 @@ If the `[design_preferences]` block is missing or empty, **skip STEP 4 entirely*
 ## 4-A. Layout Style
 User may choose ONE of: 단일 칼럼 / 랜딩 페이지 / 사이드바 / 카드 그리드
 
-Layout guidelines (reflective variant):
-- 단일 칼럼: Document/notebook style, vertical reading flow, print-friendly priority
-- 랜딩 페이지: Section-anchored sequence, soft transitions, intro-first presentation
-- 사이드바: Persistent profile/info area, main reflection separated
-- 카드 그리드: Card-based modular sections, strong visual separation
+STEP 5 embeds **layout-specific CSS + skeleton** — implement it; do not default to one vertical `.section-card` stack for every choice.
+
+- **단일 칼럼:** `.page-single` + `.doc-header` — no hero gradient / sticky nav / project grid.
+- **랜딩 페이지:** `.hero` (gradient) + `.site-nav` anchors + `.section-band` alternating backgrounds + `.projects-featured` grid when repos exist.
+- **사이드바:** `.layout-sidebar` with sticky `.sidebar` + `.main`.
+- **카드 그리드:** `.cards-grid` multi-column modules.
 
 ## 4-B. Color Theme
 User may choose ONE of: indigo / emerald / slate / rose / amber / cyan
@@ -33,8 +34,8 @@ Color usage rules:
 Do not introduce unrelated dominant colors.
 
 ## 4-C. Density Mode
-- 1페이지 내: Compress spacing, prioritize strongest evidence, reduce verbose descriptions, optimize for A4 print
-- 페이지 제한 없음: Allow detailed reflection, include additional notes, more breathing room and spacing
+- **1페이지 내:** `body.density-one-page` + density CSS snippet; hide `.secondary-*` extras; print 10pt; compress cards.
+- **페이지 제한 없음:** Full reflection length allowed.
 
 ## 4-D. Additional Custom Requests
 Reflect extra user customization unless they conflict with honesty, readability, accessibility, or print usability.
