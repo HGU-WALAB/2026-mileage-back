@@ -76,9 +76,12 @@ public class PortfolioCv extends BaseTime {
     @Builder.Default
     private String mode = "cv";
 
-    @Column(name = "prompt", columnDefinition = "TEXT")
+    /** Full assembled prompt; can exceed 64 KiB (use MEDIUMTEXT in DB — see portfolio_cv_widen_prompt_html.sql). */
+    @Lob
+    @Column(name = "prompt", columnDefinition = "MEDIUMTEXT")
     private String prompt;
 
+    @Lob
     @Column(name = "html_content", columnDefinition = "LONGTEXT")
     private String htmlContent;
 

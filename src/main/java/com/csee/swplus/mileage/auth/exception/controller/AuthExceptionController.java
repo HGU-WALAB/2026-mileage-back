@@ -83,6 +83,9 @@ public class AuthExceptionController {
             msg = "존재하지 않는 mileage_id가 포함되어 있습니다. mileage_id가 _sw_mileage_record에 있는지 확인하세요.";
         } else if (msg != null && (msg.toLowerCase().contains("duplicate") || msg.toLowerCase().contains("unique"))) {
             msg = "중복된 mileage_id가 요청에 포함되어 있습니다.";
+        } else if (msg != null && msg.toLowerCase().contains("data too long")) {
+            msg = "저장할 프롬프트/HTML이 DB 컬럼 크기를 초과했습니다. "
+                    + "ver1/src/main/resources/sql/portfolio_cv_widen_prompt_html.sql 을 실행해 prompt(MEDIUMTEXT), html_content(LONGTEXT)로 확장하세요.";
         }
         ExceptionResponse response = ExceptionResponse.builder()
                 .error("Bad Request")
